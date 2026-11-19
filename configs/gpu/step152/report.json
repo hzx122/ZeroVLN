@@ -1,0 +1,8 @@
+{
+  "schema": "action_head_ray_grpo_checkpoint",
+  "step": 152,
+  "train_scope": "full",
+  "publication_kind": "checkpoint",
+  "qwen_exported": true,
+  "qwen_export_dtype": "bf16"
+}

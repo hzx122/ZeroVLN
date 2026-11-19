@@ -30,11 +30,25 @@ Joint RL improves navigation success over ZeroVLN (Init) by **14.4 percentage po
 
 ## Quick start
 
-**Watch one episode.** Start from a Git checkout on a configured accelerator host. You will need the model weights, a matching expert checkpoint and the benchmark assets. On a new host, follow [environment setup](#environment-setup) first and fill in the paths in `environment.local.sh`. From the repository root, use a fresh output directory:
+**1. Download the step-152 checkpoint.** The [ZeroVLN weights on Hugging Face](https://huggingface.co/hzxllll/ZeroVLN/tree/776a2450bb6968f38cbeb453e37f0566bbad350d) contain the jointly trained brain, action expert and query embeddings (70.4 GB). On a configured host, run the following in Bash from the ZeroVLN repository root. First complete [environment setup](#environment-setup) and set the benchmark asset paths and `FAST_BACKBONE` in `environment.local.sh`. The expert uses a separate frozen Qwen3.5-4B visual backbone; point `FAST_BACKBONE` to your local copy.
 
 ```bash
 source ./environment.local.sh
 export PATH="$(dirname "$PYTHON"):$PATH"
+export INITIAL_CHECKPOINT="$RL_ARTIFACT_ROOT/checkpoints/global_step_000152"
+
+# With the Hugging Face CLI installed, sign in using an account with read access.
+hf auth login
+hf download hzxllll/ZeroVLN --revision 776a2450bb6968f38cbeb453e37f0566bbad350d \
+  --local-dir "$INITIAL_CHECKPOINT"
+cp configs/gpu/step152/report.json "$INITIAL_CHECKPOINT/report.json"
+```
+
+**2. Load the checkpoint and watch an episode.** Keep the directory name `global_step_000152`. The evaluator reads the step identity from [report.json](configs/gpu/step152/report.json), loads the expert and query from `action_head/` and `dualvln_query/` under `INITIAL_CHECKPOINT`, and serves the trained brain from `qwen/`. In the same shell, select the matching training configuration and start the console with a fresh output directory:
+
+```bash
+export SLOW_MODEL="$INITIAL_CHECKPOINT/qwen"
+export TRAINING_CONFIG="$PWD/configs/gpu/step152/training_config.json"
 ./run_navigation.sh --config configs/gpu/evaluation.json \
   --output-dir "$RL_ARTIFACT_ROOT/navigation-console" --port 5002
 ```
