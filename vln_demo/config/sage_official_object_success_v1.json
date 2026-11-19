@@ -1,0 +1,15 @@
+{
+  "schema": "sage-official-object-success-contract-v1",
+  "status": "frozen",
+  "frozen_date": "2026-09-11",
+  "source": "https://github.com/Galery23/SAGE-3D_Official/blob/69e60c2123aca55ff2ad96d66a80a9bac5a7912d/Code/benchmark/environment_evaluation/object_based_success.py",
+  "target_resolution": "explicit annotated target object id",
+  "region": "closed axis-aligned target object bbox expanded in XY",
+  "expansion_radius_m": 1.0,
+  "boundary_inclusive": true,
+  "requires_agent_stop": false,
+  "requires_visibility": false,
+  "requires_reachability": false,
+  "requires_collision_free": false,
+  "requires_point_goal_distance": false
+}

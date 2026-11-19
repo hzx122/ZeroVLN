@@ -1,0 +1,8 @@
+# Install with --no-deps into a system-site-packages venv on the PPU image.
+# Retain the PPU torch/torchvision; do not install upstream CUDA wheels.
+transformers==4.51.0
+tokenizers==0.21.4
+huggingface-hub==0.36.2
+# The native Lumina checkpoint hook uses the 0.32 API (upstream habitat pin).
+diffusers==0.32.2
+ftfy==6.3.1

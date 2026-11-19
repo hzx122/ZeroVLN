@@ -1,0 +1,173 @@
+{
+  "upstream_commit": "2a0aefb56f1e2d315bba924239e9e8ad9dca9d92",
+  "files": {
+    "render_server/render_sim.py": {
+      "base_sha256": "cbe3a9219ed2169b72d823879db2ea8917b4c636be7dfa0a1c0138bf9b45c4db",
+      "result_sha256": "9c522d6dba3ef1dce3f19735ddeabbeec89b1002a30c691ed0c1037c8bca0b8c",
+      "blocks": [
+        {
+          "start": 222,
+          "stop": 223,
+          "before": "            bg_color = [0, 0, 0]\n",
+          "after": "            bg_gray = min(1.0, max(0.0, float(os.environ.get(\n                \"SAGE_RENDER_BACKGROUND_GRAY\", \"0\"))))\n            bg_color = [bg_gray, bg_gray, bg_gray]\n"
+        },
+        {
+          "start": 327,
+          "stop": 328,
+          "before": "    def render_set_one_image(self, cam_extrinsics, cam_intrinsics, camera_render_gs_path, return_depth_img=False, return_depth_npz=False, render_scale=1.0):\n",
+          "after": "    def render_set_one_image(self, cam_extrinsics, cam_intrinsics, camera_render_gs_path, return_depth_img=False, return_depth_npz=False, render_scale=1.0, suppress_blue_gaussians=False, depth_downsample=1):\n"
+        },
+        {
+          "start": 373,
+          "stop": 374,
+          "before": "                     return_plane=need_depth, img_res_scale=ssaa_scale)\n",
+          "after": "                     return_plane=need_depth, img_res_scale=ssaa_scale,\n                     suppress_blue_gaussians=suppress_blue_gaussians)\n"
+        },
+        {
+          "start": 408,
+          "stop": 409,
+          "before": "            depth_arr_for_npz = depth_image_arr.copy()\n",
+          "after": "            depth_factor = max(1, int(depth_downsample))\n            depth_arr_for_npz = depth_image_arr[::depth_factor, ::depth_factor].copy()\n"
+        },
+        {
+          "start": 983,
+          "stop": 984,
+          "before": "\n",
+          "after": ""
+        }
+      ]
+    },
+    "render_server/render_sim_dynamic.py": {
+      "base_sha256": "ea68f215437498ee5bfb18c4ff0b7ec620e2ec829ffc2f6495db96b4e502f832",
+      "result_sha256": "3b12f254876395ca7231fd569c144ef2937075d0e1c6a45647a6ca546c2b1797",
+      "blocks": [
+        {
+          "start": 40,
+          "stop": 41,
+          "before": "from concurrent.futures import ThreadPoolExecutor\n",
+          "after": "from concurrent.futures import ThreadPoolExecutor, wait\n"
+        },
+        {
+          "start": 97,
+          "stop": 98,
+          "before": "        \n",
+          "after": ""
+        },
+        {
+          "start": 170,
+          "stop": 171,
+          "before": "            \n",
+          "after": ""
+        },
+        {
+          "start": 214,
+          "stop": 214,
+          "before": "",
+          "after": "            self._apply_static_boundary_mask(gs_render, scene_id)\n"
+        },
+        {
+          "start": 224,
+          "stop": 225,
+          "before": "    \n",
+          "after": "\n    @staticmethod\n    def _apply_static_boundary_mask(gs_render: GSRender, scene_id: str):\n        \"\"\"Hide cold-colour Gaussians outside the room domain once at load.\n\n        This path is opt-in through ``SAGE_USD_STATIC_BOUNDARY_MASK_ROOT``.\n        It only changes the dedicated USD render process: the source PLY and\n        the normal renderer remain untouched, and there is no per-frame depth\n        request or Python post-processing cost.\n        \"\"\"\n        root = os.environ.get(\"SAGE_USD_STATIC_BOUNDARY_MASK_ROOT\", \"\").strip()\n        if not root:\n            return\n        bare = str(scene_id)\n        if bare.startswith(\"sage-\"):\n            bare = bare[5:]\n        path = os.path.join(root, bare + \".npz\")\n        try:\n            with np.load(path, allow_pickle=False) as data:\n                version = int(np.asarray(data[\"version\"]).reshape(()))\n                domain = np.asarray(data[\"render_domain\"], dtype=np.uint8)\n                scale = float(np.asarray(data[\"scale\"]).reshape(()))\n                lower = np.asarray(data[\"lower\"], dtype=np.float64)[:2]\n                shape = tuple(int(v) for v in np.asarray(data[\"shape\"]).tolist())\n            if version < 4 or domain.shape != shape or scale <= 0:\n                raise ValueError(\"invalid USD room-domain artifact\")\n            blue_domain = domain.copy()\n            margin_m = float(os.environ.get(\n                \"SAGE_USD_STATIC_BOUNDARY_MARGIN_M\", \"0.30\"))\n            margin_px = max(0, int(np.ceil(max(0.0, margin_m) / scale)))\n            if margin_px:\n                kernel = np.ones((3, 3), dtype=np.uint8)\n                domain = cv2.dilate(domain, kernel, iterations=margin_px)\n            blue_margin_m = float(os.environ.get(\n                \"SAGE_USD_STATIC_BLUE_MARGIN_M\", \"0.10\"))\n            blue_margin_px = max(\n                0, int(np.ceil(max(0.0, blue_margin_m) / scale)))\n            if blue_margin_px:\n                kernel = np.ones((3, 3), dtype=np.uint8)\n                blue_domain = cv2.dilate(\n                    blue_domain, kernel, iterations=blue_margin_px)\n            domain = torch.as_tensor(domain.astype(bool), device=\"cuda\")\n            blue_domain = torch.as_tensor(\n                blue_domain.astype(bool), device=\"cuda\")\n            lower_t = torch.as_tensor(lower, dtype=torch.float32, device=\"cuda\")\n            gh, gw = shape\n            killed = total = 0\n            with torch.no_grad():\n                for gaussians in gs_render.gaussians_list:\n                    xyz = gaussians.get_xyz\n                    total += int(xyz.shape[0])\n                    col = torch.round((xyz[:, 0] - lower_t[0]) / scale).long()\n                    row = torch.round(\n                        (gh - 1) - (xyz[:, 1] - lower_t[1]) / scale).long()\n                    valid = ((col >= 0) & (col < gw)\n                             & (row >= 0) & (row < gh))\n                    in_domain = torch.zeros_like(valid)\n                    in_domain[valid] = domain[row[valid], col[valid]]\n                    in_blue_domain = torch.zeros_like(valid)\n                    in_blue_domain[valid] = blue_domain[\n                        row[valid], col[valid]]\n                    dc_rgb = (gaussians.get_features_dc[:, 0, :]\n                              * 0.28209479177387814 + 0.5)\n                    cold = ((dc_rgb[:, 2]\n                             - torch.maximum(dc_rgb[:, 0], dc_rgb[:, 1])\n                             >= (2.0 / 255.0))\n                            & (dc_rgb[:, 2] >= (50.0 / 255.0)))\n                    # Keep a wider neutral ring for window/door frames, while\n                    # cold Gaussians only get the narrow room-domain margin.\n                    # The far exterior is removed regardless of colour so a\n                    # glossy junk layer cannot appear behind the blue one.\n                    suppress = (~in_domain) | ((~in_blue_domain) & cold)\n                    killed += int(suppress.sum().item())\n                    gaussians._opacity.data[suppress] = -100.0\n            print(\"[SceneManager] static USD boundary mask: %s \"\n                  \"suppressed=%d/%d\" % (scene_id, killed, total))\n        except Exception as exc:\n            # Fail open: missing or stale room topology must never make a scene\n            # unloadable or alter the established RGB path.\n            print(\"[SceneManager] static USD boundary mask skipped for %s: %s\"\n                  % (scene_id, exc))\n\n"
+        },
+        {
+          "start": 278,
+          "stop": 279,
+          "before": "    \n",
+          "after": "\n"
+        },
+        {
+          "start": 420,
+          "stop": 421,
+          "before": "    \n",
+          "after": "\n"
+        },
+        {
+          "start": 427,
+          "stop": 427,
+          "before": "",
+          "after": "    suppress_blue_gaussians = data.get('suppress_blue_gaussians', False)\n    depth_downsample = max(1, int(data.get('depth_downsample', 1)))\n"
+        },
+        {
+          "start": 436,
+          "stop": 436,
+          "before": "",
+          "after": "        suppress_blue_gaussians=suppress_blue_gaussians,\n        depth_downsample=depth_downsample,\n"
+        },
+        {
+          "start": 467,
+          "stop": 468,
+          "before": "    \n",
+          "after": "\n"
+        },
+        {
+          "start": 483,
+          "stop": 483,
+          "before": "",
+          "after": "    suppress_blue_gaussians = data.get('suppress_blue_gaussians', False)\n    depth_downsample = max(1, int(data.get('depth_downsample', 1)))\n"
+        },
+        {
+          "start": 492,
+          "stop": 492,
+          "before": "",
+          "after": "        suppress_blue_gaussians=suppress_blue_gaussians,\n        depth_downsample=depth_downsample,\n"
+        },
+        {
+          "start": 523,
+          "stop": 524,
+          "before": "    \n",
+          "after": "\n"
+        },
+        {
+          "start": 549,
+          "stop": 550,
+          "before": "    \n",
+          "after": "\n"
+        },
+        {
+          "start": 572,
+          "stop": 577,
+          "before": "    \n    # 等待所有结果\n    render_results = []\n    for future_res in result_futures:\n        render_results.append(future_res.result())\n",
+          "after": "\n    # A failed view must not release the scene while sibling views still use it.\n    try:\n        render_results = [future_res.result() for future_res in result_futures]\n    finally:\n        wait(result_futures)\n"
+        },
+        {
+          "start": 696,
+          "stop": 696,
+          "before": "",
+          "after": "    parser.add_argument(\"--single-threaded\", action=\"store_true\",\n                        help=\"串行处理请求，避免渲染期间并发卸载场景\")\n"
+        },
+        {
+          "start": 748,
+          "stop": 748,
+          "before": "",
+          "after": "    from scene_lifetime import install as install_scene_lifetime\n    install_scene_lifetime(SCENE_MANAGER, app)\n\n"
+        },
+        {
+          "start": 768,
+          "stop": 769,
+          "before": "    app.run(host=\"0.0.0.0\", debug=False, port=args.port, threaded=True)\n",
+          "after": "    app.run(host=\"0.0.0.0\", debug=False, port=args.port,\n            threaded=not args.single_threaded)\n"
+        }
+      ]
+    },
+    "render_server/gaussian_renderer/pgsr.py": {
+      "base_sha256": "f93a12a3fefb88e912b6b407b4cd5ef9d6265d74f5b9ae9b2aab08bdab5c4596",
+      "result_sha256": "f69d153a6d44c04969b4581023410b3e6db62ba138d2491ad6aa661b6aa30125",
+      "blocks": [
+        {
+          "start": 47,
+          "stop": 48,
+          "before": "           render_T_offset=None, render_roll_pitch_yaw_offset=None, use_blur_opt=False, blur_opt_debug=False):\n",
+          "after": "           render_T_offset=None, render_roll_pitch_yaw_offset=None, use_blur_opt=False, blur_opt_debug=False,\n           suppress_blue_gaussians=False):\n"
+        },
+        {
+          "start": 117,
+          "stop": 117,
+          "before": "",
+          "after": "\n    if suppress_blue_gaussians:\n        # Diagnostic/fallback render for large blue sheets outside a captured\n        # interior.  Work on the learned DC/base colour; the caller blends\n        # this render only inside an already detected portal-sized artifact.\n        dc_rgb = pc.get_features[:, 0, :] * 0.28209479177387814 + 0.5\n        blue = dc_rgb[:, 2] - torch.maximum(dc_rgb[:, 0], dc_rgb[:, 1])\n        keep = torch.logical_or(blue < (2.0 / 255.0), dc_rgb[:, 2] < (50.0 / 255.0))\n        opacity = opacity * keep.unsqueeze(-1).to(opacity.dtype)\n"
+        }
+      ]
+    }
+  }
+}

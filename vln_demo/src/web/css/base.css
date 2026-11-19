@@ -1,0 +1,186 @@
+/* Shell, header, and the form controls every panel shares. */
+
+@font-face {
+  font-family: "VLN Indic";
+  src: url("../fonts/NotoSansDevanagari-Regular.ttf") format("truetype");
+  font-display: swap;
+  unicode-range: U+0900-097F, U+1CD0-1CFF, U+A8E0-A8FF;
+}
+@font-face {
+  font-family: "VLN Indic";
+  src: url("../fonts/NotoSansTelugu-Regular.ttf") format("truetype");
+  font-display: swap;
+  unicode-range: U+0C00-0C7F;
+}
+
+* { box-sizing: border-box }
+
+html, body { height: 100% }
+
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--fg);
+  font: 13.5px/1.55 "VLN Indic", -apple-system, "Segoe UI", "Noto Sans CJK SC",
+        "Microsoft YaHei", sans-serif;
+  overflow: hidden;                 /* the dock scrolls, the page does not */
+  transition: background-color .18s ease, color .18s ease;
+}
+
+code, pre, .mono { font-family: "VLN Indic", "SF Mono", Menlo, Consolas, "Noto Sans Mono CJK SC", monospace }
+
+/* ---- header --------------------------------------------------------------- */
+#top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 7px 12px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+  box-shadow: var(--shadow-1);
+  z-index: 5;
+}
+#top .brand { display: flex; align-items: center; gap: 7px; margin-right: 4px }
+#top .logo { font-size: 17px; line-height: 1 }
+#top h1 { margin: 0; font-size: 14.5px; font-weight: 650; letter-spacing: .3px }
+#top .grow { flex: 1 }
+
+.pill {
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  font-size: 11.5px;
+  color: var(--dim);
+  white-space: nowrap;
+}
+.pill b { color: var(--fg); font-weight: 620 }
+
+#state { font-weight: 650 }
+.s-idle { color: var(--dim) }
+.s-running { color: var(--accent) }
+.s-loading { color: var(--amber) }
+.s-manual { color: var(--purple) }
+.s-done { color: var(--blue) }
+.s-stopped, .s-error { color: var(--red) }
+@keyframes blink { 50% { opacity: .35 } }
+.s-running, .s-loading { animation: blink 1.4s infinite }
+
+button.icon {
+  width: 28px; height: 28px; padding: 0;
+  display: grid; place-items: center;
+  font-size: 14px; line-height: 1;
+  background: var(--panel-2); color: var(--fg);
+  border: 1px solid var(--line); border-radius: 7px;
+  cursor: pointer;
+}
+button.icon:hover { background: var(--panel-3) }
+
+#boot, .boot { padding: 40px; color: var(--dim); text-align: center; font-size: 14px }
+.boot.err { color: var(--red); white-space: pre-wrap }
+
+/* ---- form controls ------------------------------------------------------- */
+.row { display: flex; gap: 7px; align-items: center; margin-bottom: 8px; flex-wrap: wrap }
+.row > label { color: var(--dim); font-size: 11.5px; min-width: 48px }
+.row > label.narrow { min-width: 32px }
+.row > label.chk { min-width: 0; display: flex; align-items: center; gap: 3px }
+.row.off { opacity: .45; pointer-events: none }
+
+select, input, textarea {
+  background: var(--panel-2);
+  color: var(--fg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 5px 7px;
+  font-size: 12.5px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color .12s, box-shadow .12s;
+}
+select:hover, input:hover, textarea:hover { border-color: var(--line-2) }
+select:focus, input:focus, textarea:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--blue) 22%, transparent);
+}
+select { flex: 1; min-width: 88px; cursor: pointer }
+textarea { width: 100%; resize: vertical; min-height: 54px; line-height: 1.55 }
+input[type=number] { width: 62px }
+input[type=checkbox] { accent-color: var(--blue) }
+/* An empty instruction box means "run the episode's own instruction", and the
+   greyed placeholder is what says so -- so it has to stay legible. */
+::placeholder { color: var(--dim); opacity: 1 }
+
+.hint { color: var(--dim); font-size: 11px; margin: -2px 0 7px }
+.hint b { color: var(--fg-2) }
+.hint.flat { margin: 0 }
+.warn { color: var(--amber) }
+.cust { color: var(--purple) }
+
+button {
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12.5px;
+  font-family: inherit;
+  cursor: pointer;
+  color: var(--btn-fg);
+  background: var(--b-plain);
+  transition: filter .12s, transform .06s, box-shadow .12s;
+}
+button:hover { filter: brightness(1.08) }
+button:active { transform: translateY(1px) }
+button:disabled { opacity: .42; cursor: not-allowed; filter: none }
+.b-go { background: var(--b-go) }
+.b-stop { background: var(--b-stop) }
+.b-load { background: var(--b-load) }
+/* A staged scene/episode pick does nothing until 加载 is pressed, so the button
+   says so rather than letting "selected but not loaded" look like a bug. */
+.b-load.pend {
+  background: var(--b-pend);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--b-pend) 30%, transparent);
+}
+.b-man { background: var(--b-man) }
+.b-plain { background: var(--b-plain); color: var(--b-plain-fg); border-color: var(--line) }
+.b-plain:hover { background: var(--panel-3) }
+.b-sm { padding: 3px 8px; font-size: 11px }
+
+/* ---- 🔒 前端锁 ------------------------------------------------------------
+   锁上时页面**不加** pointer-events:none —— 那样点什么都毫无反应，看着像控制台挂
+   了。事件照常发生，由 lock.js 拦下来并弹出提示，人才知道是被锁了而不是坏了。
+   这里只做两件视觉上的事：把锁按钮点亮，给头部一条醒目的边。 */
+#btn-lock.lock-on {
+  background: var(--red);
+  color: var(--btn-fg);
+  border-color: var(--red);
+}
+#btn-lock.lock-on:hover { background: var(--red); filter: brightness(1.1) }
+html[data-locked="1"] #top { box-shadow: inset 0 -2px 0 var(--red), var(--shadow-1) }
+/* 每个控件都画一遍禁用态会让整页发灰、反而看不出重点，所以只灰化那些「按了会改
+   变控制台状态」的按钮，下拉框保持可读 —— 锁着的时候你仍然要能看清当前配置。 */
+html[data-locked="1"] .dk-pane button:not(.b-sm) { opacity: .5 }
+
+/* 锁的提示框。挂在 <body> 上而不是某个面板里：任何一次被拦下的操作都要能弹它，
+   包括那些发生在 dock 之外的（键盘驾驶、地图双击）。 */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 34px;
+  transform: translateX(-50%) translateY(8px);
+  max-width: min(560px, 84vw);
+  padding: 11px 18px;
+  border-radius: 10px;
+  background: var(--red);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+  box-shadow: var(--shadow-2);
+  z-index: 1000;                 /* 高过 dock 的拖拽家具（998/999） */
+  opacity: 0;
+  pointer-events: none;          /* 提示框自己不该挡住底下的画面 */
+  transition: opacity .14s ease, transform .14s ease;
+}
+.toast.on { opacity: 1; transform: translateX(-50%) translateY(0) }

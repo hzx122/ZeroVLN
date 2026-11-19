@@ -1,0 +1,28 @@
+{
+  "nodes": 1,
+  "checkpoints": [
+    {
+      "name": "openloop_exec4_step10826",
+      "path": "/data/zerovln/artifacts/v8-openloop-exec4-fm-prefix-sage1-r2r1-rxr2-gb64-4node-20261020-r1/checkpoints/v8-openloop-exec4-fm-prefix-sage1-r2r1-rxr2-gb64-4node-20261020-r1/global_step_010826",
+      "training_config": "/data/zerovln/artifacts/v8-openloop-exec4-fm-prefix-sage1-r2r1-rxr2-gb64-4node-20261020-r1/experiment_config.json",
+      "brain": "/opt/external/user-e7a01947/Model/Qwen3.6-35B-A3B"
+    }
+  ],
+  "default_backbone": "/opt/external/user-e7a01947/Model/Qwen3.5-4B",
+  "benchmarks": [
+    "sage-3d",
+    "r2r",
+    "rxr"
+  ],
+  "sample_counts": {
+    "sage-3d": 0,
+    "r2r": 0,
+    "rxr": 0
+  },
+  "sage_manifest": "/data/zerovln/artifacts/sage-official-bench-20260922-r1/dataset/closedloop_subset.json",
+  "sage_protocol_root": "/data/zerovln/artifacts/sage-official-bench-20260922-r1",
+  "navmesh_root": "/data/zerovln/artifacts/rxr-reset-geodesic-audit-20261008-r1/precision-rebake",
+  "evaluation_repeats": 1,
+  "harness_version": "v8",
+  "max_tool_calls": 200
+}

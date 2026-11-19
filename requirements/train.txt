@@ -1,0 +1,21 @@
+# Training/SFT/FM profile. Keep upstream NVIDIA vLLM in a separate environment.
+-r common.txt
+numpy>=1.26.4,<2.3
+scipy>=1.14,<2
+transformers==5.5.4
+accelerate==1.13.0
+ray[default]==2.49.2
+datasets==4.8.4
+pyarrow==24.0.0
+pandas==2.2.3
+tensordict==0.10.0
+torchdata==0.11.0
+tensorboard==2.19.0
+peft>=0.12,<1
+codetiming==1.4.0
+dill>=0.3.8,<0.4.1
+qwen-vl-utils==0.0.14
+sentencepiece>=0.2,<1
+wandb>=0.19,<1
+# PPU causal-conv1d / FLA / FlashAttention are installed from vendor wheels.
+# Do not install all upstream VERL optional backends into this profile.

@@ -1,0 +1,261 @@
+/* Per-panel styles. One block per panel module, in the same order as
+ * js/layout.js lists them. */
+
+/* ---- view / map ---------------------------------------------------------- */
+.pv-stage {
+  position: relative;               /* the tag, and the double-click ping */
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  place-items: stretch;
+  padding: 4px;
+  background: var(--code-bg);
+  overflow: hidden;
+}
+/* Fill the panel, keeping the aspect ratio. The streams are smaller than the
+   panel they live in (RGB is 640x480, the map is 420 tall), and max-width /
+   max-height only ever shrink -- so the picture used to sit at its native size
+   in the middle of the frame, covering about half of it.
+   object-fit: contain scales up as well, and letterboxes rather than distorting.
+   The cost is that the element box is now the whole frame instead of the
+   picture, so a click on the map is no longer a fraction of the picture -- see
+   pictureRect() in js/panels/map.js, which puts that back. */
+.pv-stage img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  border-radius: 5px;
+  background: #000;
+}
+.pv-stage.clickable img { cursor: crosshair }
+.pv-tag {
+  position: absolute; left: 12px; top: 10px;
+  padding: 2px 8px; border-radius: 5px;
+  background: rgba(0, 0, 0, .62);
+  color: #7ee787; font-size: 10.5px; letter-spacing: .5px;
+  pointer-events: none;
+}
+.pv-foot {
+  padding: 4px 10px 6px; font-size: 10.5px; color: var(--dim);
+  border-top: 1px solid var(--line); background: var(--panel-2);
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+/* A double-click is invisible without this: the jump takes a moment and the
+   ring says the click was heard and where. */
+.pv-ping {
+  position: absolute; width: 18px; height: 18px;
+  margin: -9px 0 0 -9px; border-radius: 50%;
+  border: 2px solid var(--blue); pointer-events: none;
+  animation: ping .55s ease-out forwards;
+}
+@keyframes ping {
+  from { transform: scale(.35); opacity: 1 }
+  to   { transform: scale(2.6); opacity: 0 }
+}
+
+/* ---- instruction -------------------------------------------------------- */
+.instr-compose {
+  flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 6px;
+}
+#instr { flex: 1; min-height: 54px; resize: none }
+.row.btns { margin: 10px 0 0 }
+.instr-ref-line, .instr-bbox-line {
+  display: flex; align-items: center; gap: 6px; min-width: 0;
+}
+.instr-compose.off .instr-ref-line,
+.instr-compose.off .instr-bbox-line { opacity: .5 }
+.instr-ref-thumb {
+  width: 44px; height: 34px; flex: 0 0 auto; object-fit: cover;
+  border: 1px solid var(--line); border-radius: 4px; background: #000;
+}
+.instr-ref-state {
+  flex: 1; min-width: 80px; overflow: hidden; text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.instr-ref-state.bad { color: var(--red) }
+.bbox-coordinate { width: 52px !important; min-width: 42px; padding-inline: 5px }
+
+.bbox-picker {
+  position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center;
+  padding: 24px; background: rgba(0, 0, 0, .72);
+}
+.bbox-picker[hidden] { display: none }
+.bbox-picker-card {
+  width: min(900px, 92vw); height: min(720px, 88vh);
+  display: flex; flex-direction: column; overflow: hidden;
+  border: 1px solid var(--line-2); border-radius: 9px;
+  background: var(--panel); box-shadow: 0 18px 60px rgba(0, 0, 0, .55);
+}
+.bbox-picker-head {
+  display: flex; align-items: center; gap: 12px; padding: 8px 10px;
+  color: var(--fg-2); font-size: 12px;
+}
+.bbox-picker-head .mono { flex: 1; color: var(--blue) }
+.bbox-picker-stage {
+  position: relative; flex: 1; min-height: 0; overflow: hidden;
+  background: #000; cursor: crosshair; touch-action: none; user-select: none;
+}
+.bbox-picker-stage img {
+  width: 100%; height: 100%; display: block; object-fit: contain;
+  pointer-events: none; user-select: none;
+}
+.bbox-drawn {
+  position: absolute; border: 3px solid #ff2525;
+  background: rgba(255, 20, 20, .08); pointer-events: none;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .65);
+}
+
+/* ---- log ---------------------------------------------------------------- */
+.log-box { flex: 1; min-height: 0; overflow-y: auto; padding: 9px 10px; font-size: 12.5px }
+.ev { margin-bottom: 8px; padding-left: 9px; border-left: 2px solid var(--line) }
+.ev.instr { border-color: var(--blue) }
+.ev.request { border-color: var(--purple) }
+.ev.model { border-color: var(--amber) }
+.ev.sys { border-color: var(--purple) }
+.ev.done { border-color: var(--accent) }
+.ev.err { border-color: var(--red) }
+.ev.tool { border-color: var(--blue) }
+.ev.obs { border-color: var(--line-2) }
+.ev .h { font-size: 10.5px; color: var(--dim); margin-bottom: 2px }
+.ev .t { white-space: pre-wrap; word-break: break-word }
+.ev.model .t { color: var(--fg-2) }
+.ev.model .model-section-label {
+  margin: 5px 0 2px; color: var(--dim); font-size: 10px; font-weight: 700;
+  letter-spacing: .35px;
+}
+
+.nav-result {
+  margin-top: 6px;
+  padding: 7px 9px;
+  border-left: 3px solid var(--amber);
+  background: color-mix(in srgb, var(--amber) 9%, transparent);
+  font-size: 12px;
+  line-height: 1.55;
+}
+.nav-result.reached {
+  border-left-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 9%, transparent);
+}
+.ev.model .t.reasoning {
+  padding: 5px 7px; border-radius: 4px; color: var(--dim);
+  background: var(--code-bg); font-size: 11.5px;
+}
+.ev.model .t.final { color: var(--fg-2) }
+.ev.tool .t { color: var(--blue); font-weight: 600 }
+.ev.obs .t { color: var(--dim); font-size: 11.5px }
+.ev.obs .note { color: var(--amber); display: block; margin-top: 2px }
+.ev.sys .t { color: var(--purple) }
+.ev .req-title { color: var(--purple) }
+.req-body {
+  overflow: visible; margin-top: 8px;
+}
+.req-message {
+  margin: 0 0 9px; padding: 7px; border: 1px solid var(--line);
+  border-radius: 6px; background: var(--code-bg);
+}
+.req-role {
+  margin-bottom: 5px; color: var(--blue); font-size: 10.5px;
+  font-weight: 700; text-transform: uppercase;
+}
+.req-text {
+  margin: 0 0 6px; padding: 7px; overflow: visible; white-space: pre-wrap;
+  word-break: break-word; color: var(--fg-2); font-size: 11px; line-height: 1.5;
+}
+.req-image-link {
+  display: inline-flex; flex-direction: column; gap: 2px; margin: 3px 6px 6px 0;
+  color: var(--dim); font-size: 10px; text-decoration: none;
+}
+.req-image {
+  display: block; width: min(240px, 100%); max-height: 180px;
+  object-fit: contain; border: 1px solid var(--line-2); border-radius: 5px;
+  background: #000;
+}
+.ev .steps { color: var(--dim); font-size: 11.5px }
+.ev .acts { margin-top: 4px }
+.ev.live { border-left-color: var(--amber) !important; background: var(--live-bg) }
+.cursor {
+  display: inline-block; width: 7px; height: 13px;
+  background: var(--amber); vertical-align: -2px;
+  animation: blink .9s infinite;
+}
+
+/* ---- terminal ----------------------------------------------------------- */
+.terminal-pane {
+  overflow: hidden; padding: 5px; background: #0f1117;
+}
+.terminal-host { flex: 1; min-width: 0; min-height: 0; overflow: hidden }
+.terminal-host .xterm { height: 100%; padding: 3px }
+.terminal-host .xterm-viewport { scrollbar-width: thin }
+.terminal-unavailable {
+  padding: 12px; color: #ffb4a9; white-space: pre-wrap;
+}
+
+/* ---- action trail ------------------------------------------------------- */
+.chips { display: flex; flex-wrap: wrap; gap: 3px }
+.chip { padding: 1px 7px; border-radius: 4px; font-size: 11px; line-height: 18px }
+.c1 { background: var(--c-fwd-bg); color: var(--c-fwd-fg) }
+.c2 { background: var(--c-left-bg); color: var(--c-left-fg) }
+.c3 { background: var(--c-right-bg); color: var(--c-right-fg) }
+.c4 { background: var(--c-back-bg); color: var(--c-back-fg) }
+.c0 { background: var(--c-bad-bg); color: var(--c-bad-fg) }
+.trail-sum { color: var(--dim); font-size: 11.5px; margin-bottom: 7px }
+.trail-sum b { color: var(--fg) }
+
+/* ---- manual pad -------------------------------------------------------- */
+.hint.mid { text-align: center; margin: 9px 0 0 }
+.pad { display: grid; grid-template-columns: repeat(3, 56px); gap: 6px; justify-content: center }
+.pad button {
+  height: 44px; padding: 0; font-size: 15px;
+  background: var(--key); color: var(--fg);
+  border: 1px solid var(--line);
+  touch-action: none; user-select: none; -webkit-user-select: none;
+}
+.pad button:hover { background: var(--key-hover) }
+/* Lit while the key is actually held: the pad doubles as a key indicator, so a
+   stuck key -- or one this tab never saw released -- is visible. */
+.pad button.on {
+  background: var(--key-on); color: #fff; border-color: var(--key-on);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--key-on) 28%, transparent);
+}
+.pad .k { display: block; font-size: 9px; color: var(--dim); margin-top: 1px }
+.pad button.on .k { color: #cfe6ff }
+
+/* ---- prompt preview / editor ------------------------------------------- */
+.pv-head {
+  display: flex; justify-content: space-between; align-items: center; gap: 8px;
+  font-size: 11px; color: var(--dim); letter-spacing: .3px; margin: 0 0 6px;
+}
+.pv-meta { color: var(--blue) }
+.pv-text, .pv-edit textarea {
+  margin: 0; padding: 10px;
+  background: var(--code-bg);
+  border: 1px solid var(--line); border-radius: 6px;
+  font-size: 11.5px; line-height: 1.65;
+  color: var(--fg-2);
+  white-space: pre-wrap; word-break: break-word;
+  overflow: auto;
+}
+.pv-text { flex: 1; min-height: 120px }
+/* The editor deliberately reuses the preview's box: reading and editing the
+   prompt in two differently sized panes makes it hard to tell whether an edit
+   landed where you meant it to. */
+.pv-edit { flex: 1; min-height: 0; display: flex; flex-direction: column }
+.pv-edit textarea { flex: 1; min-height: 120px; white-space: pre; resize: none }
+
+/* ---- per-trajectory case picker (sage) -------------------------------- */
+/* The modal shell reuses .bbox-picker/.bbox-picker-card/.bbox-picker-head;
+   only the list body and its rows are new. */
+.traj-cases-list { flex: 1; min-height: 0; overflow-y: auto; padding: 8px }
+.traj-case {
+  display: block; width: 100%; text-align: left; margin: 4px 0;
+  padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px;
+  background: var(--panel); cursor: pointer;
+}
+.traj-case:hover { border-color: var(--blue) }
+.traj-case-head, .traj-case-text {
+  display: block; overflow: hidden; text-overflow: ellipsis;
+  white-space: nowrap; font-size: 12px;
+}
+.traj-case-head { color: var(--fg-1) }
+.traj-case-text { color: var(--fg-2) }

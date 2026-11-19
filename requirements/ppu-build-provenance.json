@@ -1,0 +1,31 @@
+{
+  "observed_date": "2026-11-14",
+  "os": "Ubuntu 24.04.2 x86_64",
+  "python": "3.12.3",
+  "ppu_sdk": "2.0.0-715aa1",
+  "torch_git": "880d7c8fb5e3faa2540153edd5a4f5fda38b062a",
+  "torch_cuda_api": "12.9",
+  "wheels": {
+    "torch": {
+      "version": "2.9.0",
+      "sha256": "ca65a3012636717e25d7dd6109b18e4aa98bb82a4c6261598cfa364ce05bbeea",
+      "original_wheel_present": false
+    },
+    "torchvision": {
+      "version": "0.24.0",
+      "sha256": "dbfa70b4c2d4e604c452669d856418b9ed17153e6638442d093a57ec41f9c28c",
+      "original_wheel_present": false
+    },
+    "triton": {
+      "version": "3.5.0+git4328cd8b",
+      "sha256": "440e3cca50502421dcb5102f36fa8c1c3b19f00237ed0f13a31e012a9491e764",
+      "original_wheel_present": false
+    },
+    "flash-attn": {
+      "version": "2.7.4.post1",
+      "sha256": "08af2a4a8f327314fa3c19de68ad8741dbcd382edae2fb18436f84cedd597a40",
+      "original_wheel_present": false
+    }
+  },
+  "note": "Metadata evidence only. No vendor installers or public download endpoint located; original /tmp build wheels are absent."
+}

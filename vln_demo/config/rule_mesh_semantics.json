@@ -1,0 +1,8 @@
+{
+  "database": "/data/zerovln/artifacts/rule-teacher-mesh-history-20261002-r1/index-all-scenes-r3/mesh_semantics.sqlite",
+  "sha256": "1db7ceb6055bba5dd5a387edf1ca26c3abd551e4081a9217f5aebfe7294ea471",
+  "schema": "mesh-semantic-history-v1",
+  "scope": "map_open instance-level candidate annotations",
+  "calls": 10439,
+  "scenes": 871
+}

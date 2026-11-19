@@ -1,0 +1,35 @@
+{
+  "defaultProvider": "vllm-next-local",
+  "defaultModel": "qwen3.8-flash-next",
+  "defaultThinkingLevel": "medium",
+  "enabledModels": [
+    "anonymous-data/qwen3.7-plus:high",
+    "anonymous-data/qwen3.8-max:xhigh",
+    "anonymous-data/gpt-5.6-sol:high",
+    "anonymous-data/gpt-6-astra:high",
+    "anonymous-data/kimi-k3:max",
+    "anonymous-data/claude-opus-5:xhigh",
+    "anonymous-data/gemini-3.1-pro-preview:high",
+    "vllm-next-local/qwen3.8-flash-next:medium",
+    "sglang-local/qwen3.6-35b-a3b:medium",
+    "sglang-local/qwen3.8-27b:medium",
+    "sglang-local/qwen3.5-122b-a10b:medium"
+  ],
+  "extensions": [
+    "!**",
+    "+extensions/vln-console.ts",
+    "+extensions/project-models.ts"
+  ],
+  "skills": [
+    "!**",
+    "+skills/vln-visual-reference"
+  ],
+  "prompts": [
+    "!**"
+  ],
+  "themes": [
+    "!**"
+  ],
+  "packages": [],
+  "enableSkillCommands": false
+}

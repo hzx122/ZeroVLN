@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VLN 导航控制台</title>
+<link rel="stylesheet" href="/static/css/tokens.css">
+<link rel="stylesheet" href="/static/css/base.css">
+<link rel="stylesheet" href="/static/css/dock.css">
+<link rel="stylesheet" href="/static/css/panels.css">
+<link rel="stylesheet" href="/static/vendor/xterm/xterm.css">
+<script>
+// Applied before the first paint on purpose: doing it from the module would
+// flash a white page at anyone who chose dark mode.
+(function () {
+  try {
+    var t = localStorage.getItem('vln.theme');
+    if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t;
+  } catch (e) { /* private mode: fall through to the light default */ }
+})();
+</script>
+</head>
+<body>
+
+<header id="top">
+  <div class="brand"><span class="logo">🤖</span><h1>VLN 导航控制台</h1></div>
+  <span class="pill" id="state">连接中…</span>
+  <span class="pill">模型 <b id="p-model">-</b></span>
+  <span class="pill">资产 <b id="p-backend">-</b></span>
+  <span class="pill" id="pill-scene">场景 <b id="p-scene">-</b></span>
+  <span class="pill">回合 <b id="p-ep">-</b></span>
+  <span class="pill">步数 <b id="p-step">0</b></span>
+  <span class="pill"><span id="distance-label">距目标</span> <b id="p-dist">-</b></span>
+  <span class="pill" id="p-res" hidden></span>
+  <span class="grow"></span>
+  <span class="pill mono" id="fps"></span>
+  <button class="icon" id="btn-lock" title="锁定前端">🔓</button>
+  <button class="icon" id="btn-theme" title="切换深色 / 浅色">🌙</button>
+  <button class="icon" id="btn-layout" title="恢复默认布局">⛶</button>
+</header>
+
+<main id="dock" aria-label="面板">
+  <div id="boot" role="status" aria-live="polite">正在等待大脑服务就绪，加载完成后自动进入控制台。</div>
+</main>
+
+<!-- The dock's drag furniture: a ghost that follows the pointer and a highlight
+     over the region the panel would land in. Both live outside the tree so a
+     re-render mid-drag cannot delete them. -->
+<div id="dk-ghost" hidden></div>
+<div id="dk-drop" hidden></div>
+
+<script src="/static/vendor/xterm/xterm.js"></script>
+<script type="module" src="/static/js/app.js"></script>
+</body>
+</html>

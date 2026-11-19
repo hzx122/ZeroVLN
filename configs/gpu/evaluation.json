@@ -1,0 +1,28 @@
+{
+  "nodes": 4,
+  "checkpoints": [
+    {
+      "name": "selected_checkpoint",
+      "path": "${INITIAL_CHECKPOINT}",
+      "training_config": "${TRAINING_CONFIG}",
+      "brain": "${SLOW_MODEL}"
+    }
+  ],
+  "default_backbone": "${FAST_BACKBONE}",
+  "benchmarks": [
+    "sage-3d",
+    "r2r",
+    "rxr"
+  ],
+  "sample_counts": {
+    "sage-3d": 0,
+    "r2r": 0,
+    "rxr": 0
+  },
+  "sage_manifest": "${SAGE_MANIFEST}",
+  "sage_protocol_root": "${SAGE_PROTOCOL_ROOT}",
+  "navmesh_root": "${NAVMESH_ROOT}",
+  "evaluation_repeats": 4,
+  "harness_version": "v8",
+  "max_tool_calls": 200
+}

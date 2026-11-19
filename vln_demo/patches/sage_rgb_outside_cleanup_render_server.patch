@@ -1,0 +1,103 @@
+diff --git a/render_server/gaussian_renderer/pgsr.py b/render_server/gaussian_renderer/pgsr.py
+index 1b0877f..80bb3ea 100644
+--- a/render_server/gaussian_renderer/pgsr.py
++++ b/render_server/gaussian_renderer/pgsr.py
+@@ -45,7 +45,8 @@ def render(viewpoint_camera, pc, pipe, bg_color: torch.Tensor, scaling_modifier=
+            ntc_asg_app_debug=False, app_color_debug_vis=False, lod_debug=False,
+            return_plane=True, return_depth_normal=True, return_global_rendered_normal=False, return_rendered_alpha = False,
+            world_rotation_transfrom=None, world_translation_transfrom=None, render_z_depth=False,
+-           render_T_offset=None, render_roll_pitch_yaw_offset=None, use_blur_opt=False, blur_opt_debug=False):
++           render_T_offset=None, render_roll_pitch_yaw_offset=None, use_blur_opt=False, blur_opt_debug=False,
++           suppress_blue_gaussians=False):
+     """
+     Render the scene.
+ 
+@@ -116,6 +117,15 @@ def render(viewpoint_camera, pc, pipe, bg_color: torch.Tensor, scaling_modifier=
+     else:
+         opacity = pc.get_opacity
+ 
++    if suppress_blue_gaussians:
++        # Diagnostic/fallback render for large blue sheets outside a captured
++        # interior.  Work on the learned DC/base colour; the caller blends
++        # this render only inside an already detected portal-sized artifact.
++        dc_rgb = pc.get_features[:, 0, :] * 0.28209479177387814 + 0.5
++        blue = dc_rgb[:, 2] - torch.maximum(dc_rgb[:, 0], dc_rgb[:, 1])
++        keep = torch.logical_or(blue < (2.0 / 255.0), dc_rgb[:, 2] < (50.0 / 255.0))
++        opacity = opacity * keep.unsqueeze(-1).to(opacity.dtype)
++
+     depth = None
+     if use_opacity_distance_decay:
+         xyz_n4 = torch.cat([means3D, torch.ones([means3D.shape[0], 1], device='cuda')], axis=-1).unsqueeze(-1)
+diff --git a/render_server/render_sim.py b/render_server/render_sim.py
+index b2d55af..fe2c2db 100644
+--- a/render_server/render_sim.py
++++ b/render_server/render_sim.py
+@@ -325,7 +325,7 @@ class GSRender:
+             cv2.imwrite(f"{camera_render_gs_path}/{camera_infos[idx].image_name}.jpg", rendering_np)
+         return rendering_np_list
+ 
+-    def render_set_one_image(self, cam_extrinsics, cam_intrinsics, camera_render_gs_path, return_depth_img=False, return_depth_npz=False, render_scale=1.0):
++    def render_set_one_image(self, cam_extrinsics, cam_intrinsics, camera_render_gs_path, return_depth_img=False, return_depth_npz=False, render_scale=1.0, suppress_blue_gaussians=False, depth_downsample=1):
+         pipeline = self.pipeline
+         background = self.background
+         # scene = self.scene
+@@ -371,7 +371,8 @@ class GSRender:
+         need_depth = return_depth_img or return_depth_npz
+         out = render(view, gaussians, pipeline, background, app_color=app_color_zero_img_embed,
+                      app_color_beta=app_color_beta_zero_img_embed, app_opacity=app_opacity_zero_img_embed,
+-                     return_plane=need_depth, img_res_scale=ssaa_scale)
++                     return_plane=need_depth, img_res_scale=ssaa_scale,
++                     suppress_blue_gaussians=suppress_blue_gaussians)
+ 
+         rendering = out["render"].clamp(0.0, 1.0)
+         _, H, W = rendering.shape
+@@ -406,7 +407,8 @@ class GSRender:
+                                              interpolation=cv2.INTER_NEAREST)
+ 
+             # 复制原始深度数组用于npz（保留原始值）
+-            depth_arr_for_npz = depth_image_arr.copy()
++            depth_factor = max(1, int(depth_downsample))
++            depth_arr_for_npz = depth_image_arr[::depth_factor, ::depth_factor].copy()
+ 
+             if return_depth_img:
+                 # 处理 inf 值，用最大深度值来替代 inf
+diff --git a/render_server/render_sim_dynamic.py b/render_server/render_sim_dynamic.py
+index 61eda2d..e821cc0 100644
+--- a/render_server/render_sim_dynamic.py
++++ b/render_server/render_sim_dynamic.py
+@@ -425,6 +425,8 @@ def render_gs():
+     camera_render_gs_path = data.get('camera_render_gs_path', './')
+     return_depth_img = data.get('return_depth_img', False)
+     return_depth_npz = data.get('return_depth_npz', False)
++    suppress_blue_gaussians = data.get('suppress_blue_gaussians', False)
++    depth_downsample = max(1, int(data.get('depth_downsample', 1)))
+     render_scale = float(data.get('render_scale', getattr(ARGS, 'render_scale', 1.5)))  # 超采样倍率，1.0=关闭
+ 
+     render_result = gs_render.render_set_one_image(
+@@ -434,6 +436,8 @@ def render_gs():
+         return_depth_img,
+         return_depth_npz,
+         render_scale=render_scale,
++        suppress_blue_gaussians=suppress_blue_gaussians,
++        depth_downsample=depth_downsample,
+     )
+ 
+     etime = time.time()
+@@ -481,6 +485,8 @@ def render_gs_xyz_euler():
+     camera_render_gs_path = data.get('camera_render_gs_path', './')
+     return_depth_img = data.get('return_depth_img', False)
+     return_depth_npz = data.get('return_depth_npz', False)
++    suppress_blue_gaussians = data.get('suppress_blue_gaussians', False)
++    depth_downsample = max(1, int(data.get('depth_downsample', 1)))
+     render_scale = float(data.get('render_scale', getattr(ARGS, 'render_scale', 1.5)))  # 超采样倍率，1.0=关闭
+ 
+     render_result = gs_render.render_set_one_image(
+@@ -490,6 +496,8 @@ def render_gs_xyz_euler():
+         return_depth_img,
+         return_depth_npz,
+         render_scale=render_scale,
++        suppress_blue_gaussians=suppress_blue_gaussians,
++        depth_downsample=depth_downsample,
+     )
+ 
+     etime = time.time()

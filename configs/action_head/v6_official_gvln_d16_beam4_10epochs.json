@@ -1,0 +1,47 @@
+{
+  "schema": "action_head_scale_experiment_v1",
+  "shared": {
+    "manifest": "/data/zerovln/artifacts/action-head-sft-data-v6-beam4-official-gvln-20260922-r1/manifest.jsonl",
+    "slow_model": "/opt/external/user-e7a01947/Model/Qwen3.6-35B-A3B",
+    "output_root": "/data/zerovln/artifacts/action-head-v6-official-gvln-d16-beam4-query-10ep-20260923-r1/checkpoints",
+    "action_head_as_tool_version": "v6",
+    "validation_manifest": "/data/zerovln/artifacts/action-head-sft-data-v43-official-gvln-test100-20260911-r1/manifest.jsonl"
+  },
+  "initialization": {
+    "base_head_checkpoint": "/data/zerovln/action_head/integration/action_head_wan22_init_v1",
+    "base_query_checkpoint": "/data/zerovln/action_head/integration/qwen36_four_query_5001_migration_20260824/query",
+    "output_root": "/data/zerovln/artifacts/action-head-v6-official-gvln-d16-beam4-query-10ep-20260923-r1/initialization",
+    "seed": 20260908,
+    "extra_query_seed": 20260908,
+    "preserve_base_query_slots": 0
+  },
+  "training": {
+    "nnodes": 4,
+    "nproc_per_node": 16,
+    "anchors_per_gpu": 1,
+    "learning_rate": 0.0001,
+    "save_freq": 1000,
+    "val_freq": 0,
+    "val_subset": 0,
+    "total_epochs": 10
+  },
+  "scales": {
+    "D16": {
+      "architecture": {
+        "query_num_queries": 16,
+        "visual_num_queries": 32,
+        "fusion_dim": 384,
+        "visual_layers": 1,
+        "fusion_layers": 1,
+        "fusion_heads": 6,
+        "flow_model_dim": 384,
+        "flow_layers": 12,
+        "flow_heads": 6
+      },
+      "max_steps": 68480,
+      "run_name": "action-head-v6-official-gvln-d16-beam4-query-10ep-20260923-r1",
+      "warm_start_checkpoint": "",
+      "step_offset": 0
+    }
+  }
+}

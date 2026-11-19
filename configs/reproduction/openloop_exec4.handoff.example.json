@@ -1,0 +1,127 @@
+{
+  "training_layout": "v6_four_node_16",
+  "python": "/usr/local/bin/python3.12",
+  "fast_backbone": "/opt/external/user-e7a01947/Model/Qwen3.5-4B",
+  "learning_rate": 5e-05,
+  "communication_environment": {
+    "NCCL_SOCKET_IFNAME": "=eth0",
+    "GLOO_SOCKET_IFNAME": "eth0",
+    "NCCL_DEBUG": "INFO",
+    "NCCL_MAX_NCHANNELS": "4",
+    "NCCL_MIN_NCHANNELS": "4",
+    "NCCL_DEBUG_SUBSYS": "INIT,NET",
+    "NCCL_NET": "IB",
+    "NCCL_NET_PLUGIN": "none",
+    "NCCL_IB_DISABLE": "0"
+  },
+  "root": "/data/zerovln/artifacts/__EXPR__",
+  "data_root": "/data/zerovln/artifacts/v8-openloop-sage1-r2r1-rxr2-gb64-prefix-4node-20261019-r1/indexes",
+  "published_index": "/data/zerovln/artifacts/v8-openloop-sage1-r2r1-rxr2-gb64-prefix-4node-20261019-r1/indexes",
+  "published_inputs": "/data/zerovln/artifacts/v8-openloop-sage1-r2r1-rxr2-gb64-prefix-4node-20261019-r1/inputs/three-source-inputs.json",
+  "training_source": "/root/rl-code/__EXPR__/repo",
+  "collection_source": "/root/rl-code/__EXPR__/repo",
+  "composition": "/root/rl-code/__EXPR__/repo/scripts/train/formal_rule_teacher_pipeline.py",
+  "v6_template": {
+    "path": "/root/rl-code/__EXPR__/repo/configs/action_head/v6_official_gvln_d16_beam4_10epochs.json",
+    "sha256": "86725882008b4ee344f9b71786256815cf3da4e99fadb5f94c2732455714f991"
+  },
+  "runtime": "/tmp/__EXPR__",
+  "run_name": "__EXPR__",
+  "task_id": "__TASK_ID__",
+  "job_id": "__JOB_ID__",
+  "workspace": "150120",
+  "quota_id": "quota-anonymous",
+  "nodes_prelaunched": true,
+  "action_head_as_tool_version": "v8",
+  "source_sampling_ratio": {
+    "sage": 1,
+    "r2r": 1,
+    "rxr": 2
+  },
+  "bindings": [
+    {
+      "path": "/data/zerovln/artifacts/v8-openloop-sage1-r2r1-rxr2-gb64-prefix-4node-20261019-r1/inputs-ready.json",
+      "sha256": "cc4377472b5f5f9284884dfaca1f9ad89d10f27ffcde96e1a99af3bffcee3fa8"
+    },
+    {
+      "path": "/data/zerovln/artifacts/v8-openloop-sage1-r2r1-rxr2-gb64-prefix-4node-20261019-r1/inputs/three-source-inputs.json",
+      "sha256": "0f66155d37459e218f0f0763e44119d69f00d9eae3192810baf0ce75b811230c"
+    },
+    {
+      "path": "/data/zerovln/artifacts/v8-openloop-sage1-r2r1-rxr2-gb64-prefix-4node-20261019-r1/indexes/r2r/summary.json",
+      "sha256": "aac57a2d6ab503ef99787ec6a2928a97235da766975a5d2ec80071d18b090786"
+    },
+    {
+      "path": "/data/zerovln/artifacts/v8-openloop-sage1-r2r1-rxr2-gb64-prefix-4node-20261019-r1/indexes/rxr/summary.json",
+      "sha256": "56a406c4ee1f5975f49a261701408189b4542e412f47338b3b4623ccb8970ab4"
+    },
+    {
+      "path": "/data/zerovln/artifacts/v8-openloop-sage1-r2r1-rxr2-gb64-prefix-4node-20261019-r1/indexes/sage/summary.json",
+      "sha256": "34573ad9302099f7236b3d9dd92171ea5135cfc77dfc885e308d9423c7fd0ec0"
+    }
+  ],
+  "master_port": 29561,
+  "git_runtime": {
+    "repository": "https://git.example.invalid/anonymous/closed_loop_3dgs_rl.git",
+    "commit": "__PUSHED_COMMIT__",
+    "verl_checkout": "/root/rl-code/__EXPR__/repo/verl"
+  },
+  "pods": [
+    "__POD_0__",
+    "__POD_1__",
+    "__POD_2__",
+    "__POD_3__"
+  ],
+  "pod_start_times": {
+    "__POD_0__": "__POD_START_TIME_0__",
+    "__POD_1__": "__POD_START_TIME_1__",
+    "__POD_2__": "__POD_START_TIME_2__",
+    "__POD_3__": "__POD_START_TIME_3__"
+  },
+  "resident_owners": [
+    {
+      "hostname": "__POD_0__",
+      "debug_control": "/root/rl-code/__EXPR__/repo/scripts/train/run_dlc_debug_reservation.py",
+      "debug_output": "__RESIDENT_DEBUG_OUTPUT_0__",
+      "controller_identity": {
+        "pid": 0,
+        "start_ticks": "__CONTROLLER_START_TICKS_0__",
+        "state": "S"
+      }
+    },
+    {
+      "hostname": "__POD_1__",
+      "debug_control": "/root/rl-code/__EXPR__/repo/scripts/train/run_dlc_debug_reservation.py",
+      "debug_output": "__RESIDENT_DEBUG_OUTPUT_1__",
+      "controller_identity": {
+        "pid": 0,
+        "start_ticks": "__CONTROLLER_START_TICKS_1__",
+        "state": "S"
+      }
+    },
+    {
+      "hostname": "__POD_2__",
+      "debug_control": "/root/rl-code/__EXPR__/repo/scripts/train/run_dlc_debug_reservation.py",
+      "debug_output": "__RESIDENT_DEBUG_OUTPUT_2__",
+      "controller_identity": {
+        "pid": 0,
+        "start_ticks": "__CONTROLLER_START_TICKS_2__",
+        "state": "S"
+      }
+    },
+    {
+      "hostname": "__POD_3__",
+      "debug_control": "/root/rl-code/__EXPR__/repo/scripts/train/run_dlc_debug_reservation.py",
+      "debug_output": "__RESIDENT_DEBUG_OUTPUT_3__",
+      "controller_identity": {
+        "pid": 0,
+        "start_ticks": "__CONTROLLER_START_TICKS_3__",
+        "state": "S"
+      }
+    }
+  ],
+  "local_replica_load": true,
+  "fm_prefix_reuse": true,
+  "checkpoint_stride_epochs": 0.2,
+  "v8_label_profile": "exec4"
+}

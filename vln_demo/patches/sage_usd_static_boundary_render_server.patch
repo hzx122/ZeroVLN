@@ -1,0 +1,113 @@
+diff --git a/render_server/render_sim.py b/render_server/render_sim.py
+--- a/render_server/render_sim.py
++++ b/render_server/render_sim.py
+@@ -220,7 +220,9 @@ class GSRender:
+                         self.gaussians_list.append(gaussians)
+ 
+ 
+-            bg_color = [0, 0, 0]
++            bg_gray = min(1.0, max(0.0, float(os.environ.get(
++                "SAGE_RENDER_BACKGROUND_GRAY", "0"))))
++            bg_color = [bg_gray, bg_gray, bg_gray]
+             self.background = torch.tensor(bg_color, dtype=torch.float32, device="cuda")
+ 
+             self.pipeline = pipeline
+diff --git a/render_server/render_sim_dynamic.py b/render_server/render_sim_dynamic.py
+--- a/render_server/render_sim_dynamic.py
++++ b/render_server/render_sim_dynamic.py
+@@ -212,6 +212,7 @@ class SceneManager:
+                 args=scene_args,
+                 load_ply_root=scene_path
+             )
++            self._apply_static_boundary_mask(gs_render, scene_id)
+             load_duration = (time.time() - load_start_time) * 1000
+             print(f"[SceneManager] ✔ 场景加载完成: {scene_id}")
+             print(f"  - GPU: {gpu_id}")
+@@ -222,6 +223,87 @@ class SceneManager:
+             # 恢复原始设备
+             if original_device is not None:
+                 torch.cuda.set_device(original_device)
++
++    @staticmethod
++    def _apply_static_boundary_mask(gs_render: GSRender, scene_id: str):
++        """Hide cold-colour Gaussians outside the room domain once at load.
++
++        This path is opt-in through ``SAGE_USD_STATIC_BOUNDARY_MASK_ROOT``.
++        It only changes the dedicated USD render process: the source PLY and
++        the normal renderer remain untouched, and there is no per-frame depth
++        request or Python post-processing cost.
++        """
++        root = os.environ.get("SAGE_USD_STATIC_BOUNDARY_MASK_ROOT", "").strip()
++        if not root:
++            return
++        bare = str(scene_id)
++        if bare.startswith("sage-"):
++            bare = bare[5:]
++        path = os.path.join(root, bare + ".npz")
++        try:
++            with np.load(path, allow_pickle=False) as data:
++                version = int(np.asarray(data["version"]).reshape(()))
++                domain = np.asarray(data["render_domain"], dtype=np.uint8)
++                scale = float(np.asarray(data["scale"]).reshape(()))
++                lower = np.asarray(data["lower"], dtype=np.float64)[:2]
++                shape = tuple(int(v) for v in np.asarray(data["shape"]).tolist())
++            if version < 4 or domain.shape != shape or scale <= 0:
++                raise ValueError("invalid USD room-domain artifact")
++            blue_domain = domain.copy()
++            margin_m = float(os.environ.get(
++                "SAGE_USD_STATIC_BOUNDARY_MARGIN_M", "0.30"))
++            margin_px = max(0, int(np.ceil(max(0.0, margin_m) / scale)))
++            if margin_px:
++                kernel = np.ones((3, 3), dtype=np.uint8)
++                domain = cv2.dilate(domain, kernel, iterations=margin_px)
++            blue_margin_m = float(os.environ.get(
++                "SAGE_USD_STATIC_BLUE_MARGIN_M", "0.10"))
++            blue_margin_px = max(
++                0, int(np.ceil(max(0.0, blue_margin_m) / scale)))
++            if blue_margin_px:
++                kernel = np.ones((3, 3), dtype=np.uint8)
++                blue_domain = cv2.dilate(
++                    blue_domain, kernel, iterations=blue_margin_px)
++            domain = torch.as_tensor(domain.astype(bool), device="cuda")
++            blue_domain = torch.as_tensor(
++                blue_domain.astype(bool), device="cuda")
++            lower_t = torch.as_tensor(lower, dtype=torch.float32, device="cuda")
++            gh, gw = shape
++            killed = total = 0
++            with torch.no_grad():
++                for gaussians in gs_render.gaussians_list:
++                    xyz = gaussians.get_xyz
++                    total += int(xyz.shape[0])
++                    col = torch.round((xyz[:, 0] - lower_t[0]) / scale).long()
++                    row = torch.round(
++                        (gh - 1) - (xyz[:, 1] - lower_t[1]) / scale).long()
++                    valid = ((col >= 0) & (col < gw)
++                             & (row >= 0) & (row < gh))
++                    in_domain = torch.zeros_like(valid)
++                    in_domain[valid] = domain[row[valid], col[valid]]
++                    in_blue_domain = torch.zeros_like(valid)
++                    in_blue_domain[valid] = blue_domain[
++                        row[valid], col[valid]]
++                    dc_rgb = (gaussians.get_features_dc[:, 0, :]
++                              * 0.28209479177387814 + 0.5)
++                    cold = ((dc_rgb[:, 2]
++                             - torch.maximum(dc_rgb[:, 0], dc_rgb[:, 1])
++                             >= (2.0 / 255.0))
++                            & (dc_rgb[:, 2] >= (50.0 / 255.0)))
++                    # Keep a wider neutral ring for window/door frames, while
++                    # cold Gaussians only get the narrow room-domain margin.
++                    # The far exterior is removed regardless of colour so a
++                    # glossy junk layer cannot appear behind the blue one.
++                    suppress = (~in_domain) | ((~in_blue_domain) & cold)
++                    killed += int(suppress.sum().item())
++                    gaussians._opacity.data[suppress] = -100.0
++            print("[SceneManager] static USD boundary mask: %s "
++                  "suppressed=%d/%d" % (scene_id, killed, total))
++        except Exception as exc:
++            # Fail open: missing or stale room topology must never make a scene
++            # unloadable or alter the established RGB path.
++            print("[SceneManager] static USD boundary mask skipped for %s: %s"
++                  % (scene_id, exc))
+ 
+     def _create_scene_args(self, gpu_id: int):
+         """为特定GPU创建参数副本"""

@@ -1,0 +1,11 @@
+{
+  "repository": "https://github.com/amap-cvlab/ABot-Navigation.git",
+  "commit": "2a0aefb56f1e2d315bba924239e9e8ad9dca9d92",
+  "subdirectory": "render_server",
+  "purpose": "Maintained renderer integration; preserves the H00 static-boundary and blue-artifact behavior",
+  "modified_files": [
+    "render_sim.py",
+    "render_sim_dynamic.py",
+    "gaussian_renderer/pgsr.py"
+  ]
+}

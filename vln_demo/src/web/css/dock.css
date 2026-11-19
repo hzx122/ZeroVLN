@@ -1,0 +1,164 @@
+/* The dock: nested splits, tab groups, drag sashes and drop previews.
+ *
+ * Geometry is all flexbox -- a split is a flex container and its children carry
+ * a flex-basis percentage, which is what lets a sash drag be a couple of style
+ * writes instead of a re-render. */
+
+#dock {
+  flex: 1;
+  min-height: 0;
+  padding: 7px;
+  display: flex;
+  overflow: hidden;
+}
+
+.dk-split { display: flex; flex: 1; min-width: 0; min-height: 0 }
+.dk-split.dk-row { flex-direction: row }
+.dk-split.dk-col { flex-direction: column }
+.dk-split > .dk-split, .dk-split > .dk-group { min-width: 0; min-height: 0 }
+
+/* ---- sash ---------------------------------------------------------------- */
+.dk-sash { flex: 0 0 7px; position: relative; z-index: 2 }
+.dk-split.dk-row > .dk-sash { cursor: col-resize }
+.dk-split.dk-col > .dk-sash { cursor: row-resize }
+/* The hit area is the whole 7px; the visible line is a 3px pill that only
+   appears on hover, so a resting layout has no clutter between panels. */
+.dk-sash::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  border-radius: 999px;
+  background: transparent;
+  transition: background-color .12s;
+}
+.dk-split.dk-row > .dk-sash::after { width: 3px; height: 34px }
+.dk-split.dk-col > .dk-sash::after { height: 3px; width: 34px }
+.dk-sash:hover::after, .dk-sash.dk-drag::after { background: var(--blue) }
+body.dk-sizing { cursor: inherit; user-select: none }
+body.dk-sizing iframe, body.dk-sizing img { pointer-events: none }
+
+/* ---- group (a tab strip plus one visible body) --------------------------- */
+.dk-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 120px;
+  min-height: 80px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-1);
+  overflow: hidden;
+  transition: box-shadow .15s, border-color .15s;
+}
+.dk-group.dk-over { border-color: var(--drop) }
+
+.dk-tabs {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  padding: 3px 3px 0;
+  background: var(--panel-2);
+  border-bottom: 1px solid var(--line);
+  min-height: 29px;
+  overflow: hidden;
+}
+.dk-tab {
+  display: flex; align-items: center; gap: 5px;
+  padding: 4px 10px 5px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  font-size: 11.5px;
+  font-weight: 550;
+  letter-spacing: .3px;
+  color: var(--dim);
+  background: transparent;
+  cursor: grab;
+  user-select: none;
+  white-space: nowrap;
+  transition: background-color .12s, color .12s;
+}
+.dk-tab:hover { color: var(--fg-2); background: var(--panel-3) }
+.dk-tab.dk-on {
+  color: var(--fg);
+  background: var(--panel);
+  border-color: var(--line);
+  margin-bottom: -1px;
+  padding-bottom: 6px;
+}
+.dk-tab.dk-drag { opacity: .35 }
+.dk-tab .dk-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--blue); opacity: .55 }
+.dk-tab.dk-on .dk-dot { opacity: 1 }
+
+.dk-tools { margin-left: auto; display: flex; align-items: center; gap: 3px; padding: 0 4px 3px }
+/* Panel buttons, not icons: 清空 is two characters, and the 21px square this
+   used to be turned it into two stacked characters. They size to their text and
+   carry a hairline box so they read as a control rather than as another tab. */
+.dk-tools button {
+  height: 20px;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  font-size: 11px;
+  letter-spacing: .3px;
+  line-height: 1;
+  color: var(--dim);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+}
+.dk-tools button:hover {
+  background: var(--panel-3);
+  color: var(--fg);
+  border-color: var(--line-2);
+}
+
+.dk-body { flex: 1; min-height: 0; position: relative; overflow: hidden }
+/* Panels are built once and re-parented, never rebuilt: the first-person view
+   is an open MJPEG stream and the log has a scroll position, both of which a
+   rebuild would throw away. Hidden ones stay in the DOM. */
+.dk-pane { position: absolute; inset: 0; display: flex; flex-direction: column; overflow: auto }
+.dk-pane[hidden] { display: none }
+.dk-pad { padding: 10px }
+
+/* ---- drag furniture ------------------------------------------------------ */
+#dk-ghost {
+  position: fixed;
+  z-index: 999;
+  pointer-events: none;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fg);
+  background: var(--panel);
+  border: 1px solid var(--drop);
+  border-radius: 7px;
+  box-shadow: var(--shadow-drag);
+  transform: translate(-50%, -50%) scale(1);
+  animation: dk-pop .14s ease-out;
+}
+@keyframes dk-pop {
+  from { transform: translate(-50%, -50%) scale(.8); opacity: 0 }
+  to   { transform: translate(-50%, -50%) scale(1); opacity: 1 }
+}
+#dk-drop {
+  position: fixed;
+  z-index: 998;
+  pointer-events: none;
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--drop) 17%, transparent);
+  border: 2px solid var(--drop);
+  box-shadow: inset 0 0 24px color-mix(in srgb, var(--drop) 20%, transparent);
+  transition: left .11s cubic-bezier(.2, .8, .3, 1), top .11s cubic-bezier(.2, .8, .3, 1),
+              width .11s cubic-bezier(.2, .8, .3, 1), height .11s cubic-bezier(.2, .8, .3, 1);
+}
+body.dk-dragging { cursor: grabbing !important; user-select: none }
+body.dk-dragging .dk-pane { pointer-events: none }
+
+/* A maximised group hides its siblings rather than rewriting the tree, so
+   restoring is exact -- the sizes never changed. */
+.dk-split.dk-hasmax > * { display: none }
+.dk-split.dk-hasmax > .dk-maxpath { display: flex; flex: 1 1 100% !important }

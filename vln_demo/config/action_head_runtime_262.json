@@ -1,0 +1,44 @@
+{
+  "schema": "action_head_runtime_config_v1",
+  "defaults": {
+    "backbone": "/opt/external/user-e7a01947/Model/Qwen3.5-4B",
+    "query_cache": "/workspace/action_head_query_cache",
+    "slow_vllm_url": "http://127.0.0.1:28899",
+    "slow_vllm_model": "Qwen3.6-35B",
+    "visible_devices": "11,12",
+    "seed": 20260827
+  },
+  "variants": {
+    "trained": {
+      "checkpoint": "/data/zerovln/action_head/sft_ckpt/action-head-fm-formal-p0-r7-w16-s200-20260827-r1/action_head",
+      "device": "cuda:0",
+      "visual_device": "cuda:0",
+      "legacy": true
+    },
+    "trained_10ep": {
+      "checkpoint": "/data/zerovln/action_head/sft_ckpt/action_head_cold_start/action-head-official-gvln-10ep-4node-gb64-gc-on-20260831-r1/global_step_019630/action_head",
+      "device": "cuda:0",
+      "visual_device": "cuda:0"
+    },
+    "trained_2800": {
+      "checkpoint": "/data/zerovln/action_head/sft_ckpt/action-head-fm-formal-p0-s5000-save200-vsub32-20260828/global_step_002800/action_head",
+      "device": "cuda:0",
+      "visual_device": "cuda:0"
+    },
+    "untrained": {
+      "checkpoint": "/data/zerovln/action_head/integration/action_head_wan22_init_v1",
+      "device": "cuda:1",
+      "visual_device": "cuda:1"
+    }
+  },
+  "splits": {
+    "action_head_curriculum": {
+      "gym_url": "http://127.0.0.1:8938",
+      "auto_start_gym": false
+    },
+    "official_gvln_action_head_p0_sample50": {
+      "gym_url": "http://127.0.0.1:8939",
+      "auto_start_gym": false
+    }
+  }
+}

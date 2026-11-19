@@ -1,0 +1,106 @@
+# Sage-3D self-built episode production contract.
+# `bash vln_demo/run_demo_episodes.sh` consumes this file without overrides.
+# Experiments must use a separate wrapper and override only changed dotted keys.
+
+pipeline:
+  name: sage_demo_production_grounded_v4
+  version: 2026-08-19-wide-natural-smooth-v2
+  canonical: true
+
+runtime:
+  sage_root: /data/zerovln/SAGE-3D
+  demo_root: /data/zerovln/SAGE-3D/demo_build
+  out_vln: /data/zerovln/SAGE-3D/SAGE-3D_VLN_Data/demo/Trajectory_demo
+  render_url: http://127.0.0.1:7038
+  scenes: ["840483", "841249", "840779"]
+  episodes_per_scene: 5
+  require_all_scenes: true
+  trace_rejections: false
+  seed: 20260817
+
+camera:
+  width: 640
+  height: 480
+  hfov_deg: 115.0
+  height_m: 1.2
+
+robot:
+  physical_radius_m: 0.07
+  planning_margin_m: 0.03
+  replay_step_m: 0.10
+
+planner:
+  mode: ecm
+  # Reject a whole stance/path candidate below this strength and try the next
+  # candidate. This keeps collision safety without publishing sharp ECM lines.
+  min_accepted_smoothing_blend: 0.75
+  ecm:
+    c_pref_m: 0.6
+    w_length: 1.0
+    w_clearance: 0.8
+    alpha: 2.0
+    max_detour_ratio: 0.25
+    shortcut_cost_ratio: 1.01
+  smoothing:
+    catmull_alpha: 0.5
+    samples_per_segment: 8
+    position_window: 5
+    output_step_m: 0.10
+    blend_strengths: [1.0, 0.75, 0.5, 0.25, 0.125, 0.0625, 0.0]
+    max_length_ratio: 1.05
+    max_clearance_loss_m: 0.05
+
+sampling:
+  pair_euclidean_m: [4.0, 12.0]
+  pair_geodesic_m: [5.0, 15.0]
+  start_min_spacing_m: 1.0
+  goal_standoff_m: [0.65, 0.90, 1.20]
+  max_episodes_per_object: 2
+  max_stances_per_object: 6
+
+goal:
+  terminal_mode: visibility_set
+  approach_m: 0.60
+  room_margin_m: 0.20
+  room_tail_m: 0.35
+  max_bearing_error_deg: 40.0
+
+visibility:
+  min_bbox_width_px: 32
+  min_bbox_height_px: 32
+  min_projected_area_ratio: 0.01
+  min_depth_area_ratio: 0.001
+  depth_tolerance_m: 0.10
+  depth_sample_stride: 4
+  confirmation_offset_m: 0.25
+  min_detection_width_px: 20
+  min_detection_height_px: 20
+  min_detection_area_ratio: 0.001
+  min_detection_depth_fraction: 0.12
+  vlm_url: http://127.0.0.1:28899/v1/chat/completions
+  vlm_models_url: http://127.0.0.1:28899/v1/models
+  vlm_model: Qwen3.6-35B
+
+# Optional route-shape gates used by non-canonical capability-profile builds.
+# The defaults are deliberately neutral except for the canonical cross-room
+# contract, so the production batch remains byte-for-byte equivalent in scope.
+capability_profile:
+  name: canonical
+  require_cross_room: true
+  start_target_visibility_max_arc_m: 0.0
+  min_turns: 0
+  max_turns: 999
+  min_doors: 0
+  max_doors: 999
+  min_decisions: 0
+  min_landmarks: 0
+  min_clearance_m: 0.0
+  max_clearance_m: 999.0
+  max_visible_same_family_distractors: 999
+  allowed_target_families: []
+  grounding_max_length_gap_m: 1.5
+  grounding_max_length_ratio: 1.25
+  grounding_max_turn_gap: 1
+  grounding_max_door_gap: 1
+  grounding_min_goal_separation_m: 1.0
+  grounding_max_candidates_per_start: 8

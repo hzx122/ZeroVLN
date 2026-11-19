@@ -1,0 +1,112 @@
+/* Every colour in the console, twice.
+ *
+ * Light is the default (:root) and dark is an override on the <html> element,
+ * so a first paint with no JavaScript at all is the light theme -- there is no
+ * flash-of-wrong-theme to design around. index.html sets data-theme from
+ * localStorage before this sheet's first paint for the dark case.
+ *
+ * Rule for adding one: if a panel needs a colour, it gets a token here rather
+ * than a literal. The old page hard-coded #0d1117 and friends in fifteen
+ * places, which is exactly why it only ever had one theme. */
+
+:root {
+  color-scheme: light;
+
+  --bg: #eef1f5;            /* behind the dock, between panels */
+  --panel: #ffffff;         /* a panel's body */
+  --panel-2: #f5f7fa;       /* tab strips, inputs, table headers */
+  --panel-3: #e9edf2;       /* hover, pressed, inset boxes */
+  --code-bg: #f6f8fa;       /* preview / editor surfaces */
+  --line: #d5dbe2;
+  --line-2: #c2cad4;
+
+  --fg: #1f2328;
+  --fg-2: #4d5763;
+  --dim: #7a848f;
+
+  --accent: #1a7f37;        /* running, success */
+  --blue: #0969da;          /* selection, tools, info */
+  --amber: #9a6700;         /* loading, warnings, the live cursor */
+  --red: #cf222e;
+  --purple: #8250df;
+
+  --sel-bg: #ddeeff;        /* focus / active tab tint */
+  --drop: #0969da;          /* dock drop preview */
+
+  --btn-fg: #ffffff;
+  --b-go: #1f883d;
+  --b-stop: #bc4c00;
+  --b-load: #0969da;
+  --b-pend: #9a6700;
+  --b-man: #8250df;
+  --b-plain: #e5e9ef;
+  --b-plain-fg: #1f2328;
+
+  --key: #eaeef3;           /* the W/A/S/D pad */
+  --key-hover: #dde3ea;
+  --key-on: #0969da;
+
+  /* action-trail chips and log rails: paired bg/fg so a chip is legible in
+     either theme rather than dark-on-dark */
+  --c-fwd-bg: #dafbe1;   --c-fwd-fg: #116329;
+  --c-back-bg: #efe3ff;  --c-back-fg: #6639ba;
+  --c-left-bg: #ddf4ff;  --c-left-fg: #0550ae;
+  --c-right-bg: #fff8c5; --c-right-fg: #7d4e00;
+  --c-bad-bg: #ffebe9;   --c-bad-fg: #a40e26;
+
+  --live-bg: #fffbdd;
+  --shadow-1: 0 1px 2px rgba(27, 31, 36, .08);
+  --shadow-2: 0 8px 24px rgba(66, 74, 83, .16);
+  --shadow-drag: 0 12px 36px rgba(27, 31, 36, .28);
+  --radius: 8px;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* the palette the console shipped with, kept verbatim so "深色模式" really is
+     the look that was there before rather than a new dark theme */
+  --bg: #0d1117;
+  --panel: #161b22;
+  --panel-2: #1c2129;
+  --panel-3: #262c36;
+  --code-bg: #0b0f14;
+  --line: #2d333b;
+  --line-2: #3d444d;
+
+  --fg: #e6edf3;
+  --fg-2: #c9d1d9;
+  --dim: #8b949e;
+
+  --accent: #3fb950;
+  --blue: #58a6ff;
+  --amber: #d29922;
+  --red: #f85149;
+  --purple: #bc8cff;
+
+  --sel-bg: #1f2d3d;
+  --drop: #58a6ff;
+
+  --b-go: #238636;
+  --b-stop: #a4342b;
+  --b-load: #1f6feb;
+  --b-pend: #9e6a03;
+  --b-man: #8250df;
+  --b-plain: #30363d;
+  --b-plain-fg: #e6edf3;
+
+  --key: #30363d;
+  --key-hover: #3d444d;
+  --key-on: #1f6feb;
+
+  --c-fwd-bg: #1a3a24;   --c-fwd-fg: #56d364;
+  --c-back-bg: #2d2440;  --c-back-fg: #b392f0;
+  --c-left-bg: #132f4e;  --c-left-fg: #79c0ff;
+  --c-right-bg: #3d2e0f; --c-right-fg: #e3b341;
+  --c-bad-bg: #4a1f1c;   --c-bad-fg: #ff7b72;
+
+  --live-bg: #1d1c14;
+  --shadow-1: 0 1px 2px rgba(1, 4, 9, .5);
+  --shadow-2: 0 8px 24px rgba(1, 4, 9, .6);
+  --shadow-drag: 0 12px 36px rgba(1, 4, 9, .8);
+}

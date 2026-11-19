@@ -1,0 +1,10 @@
+outputs/
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.swp
+*.swo
+*~
+.DS_Store
+.claude/

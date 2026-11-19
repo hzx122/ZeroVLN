@@ -1,0 +1,17 @@
+{
+  "training_root": "/data/zerovln/artifacts/v8-openloop-exec4-fm-prefix-sage1-r2r1-rxr2-gb64-4node-20261020-r1",
+  "training_config": "/data/zerovln/artifacts/v8-openloop-exec4-fm-prefix-sage1-r2r1-rxr2-gb64-4node-20261020-r1/experiment_config.json",
+  "checkpoint_root": "/data/zerovln/artifacts/v8-openloop-exec4-fm-prefix-sage1-r2r1-rxr2-gb64-4node-20261020-r1/checkpoints/v8-openloop-exec4-fm-prefix-sage1-r2r1-rxr2-gb64-4node-20261020-r1",
+  "checkpoint_index": "/data/zerovln/artifacts/v8-openloop-exec4-fm-prefix-sage1-r2r1-rxr2-gb64-4node-20261020-r1/checkpoint-index.json",
+  "checkpoint_publication": "sft_index",
+  "steps": [
+    10826
+  ],
+  "checkpoint_paths": {
+    "10826": "/data/zerovln/artifacts/v8-openloop-exec4-fm-prefix-sage1-r2r1-rxr2-gb64-4node-20261020-r1/checkpoints/v8-openloop-exec4-fm-prefix-sage1-r2r1-rxr2-gb64-4node-20261020-r1/global_step_010826"
+  },
+  "slow_model": "/opt/external/user-e7a01947/Model/Qwen3.6-35B-A3B",
+  "python": "/usr/local/bin/python3.12",
+  "resident_owners": [],
+  "suite_gpu_preflight": false
+}

@@ -1,0 +1,21 @@
+# Simulation/Web/3DGS profile. Do not combine with the vLLM serving profile.
+# Install platform torch first; build Habitat and the rasterizers separately.
+-r common.txt
+numpy==1.26.4
+scipy>=1.14,<1.18
+numba==0.61.2
+opencv-python==4.11.0.86
+numpy-quaternion>=2023.0.0
+attrs>=23
+imageio>=2.34,<3
+imageio-ffmpeg>=0.5,<1
+matplotlib>=3.8,<4
+gym==0.22.0
+GitPython>=3.1.40
+Flask==3.1.3
+flask-cors==6.0.5
+plyfile==1.1.5
+e3nn==0.6.0
+# Habitat-Sim/Lab/Magnum: use the pinned source instructions in REQUIREMENTS.md.
+# The legacy manual FM picker additionally requires the train profile's model stack;
+# the recommended unified v8 page keeps model services in the training environment.

@@ -1,0 +1,32 @@
+{
+  "schema": "action_head_runtime_config_v1",
+  "defaults": {
+    "backbone": "/opt/external/user-e7a01947/Model/Qwen3.5-4B",
+    "query_cache": "/data/zerovln/artifacts/v5-native-driver-live-20260917-r1/queries",
+    "slow_vllm_url": "http://127.0.0.1:28927",
+    "slow_vllm_model": "Qwen3.6-35B",
+    "visible_devices": "0",
+    "seed": 20260917,
+    "checkpoint": "/data/zerovln/artifacts/action-head-v43-official-gvln-d16-l2normfix-from1000-20260912-r5/checkpoints/action-head-v43-official-gvln-d16-l2normfix-from1000-20260912-r5/global_step_007000/action_head",
+    "device": "cuda:0",
+    "visual_device": "cuda:0"
+  },
+  "variants": {
+    "trained_v43_7000": {},
+    "v5_native": {
+      "context_encoder_model": "/opt/external/user-e7a01947/Model/Qwen3.6-35B-A3B",
+      "context_aggregator_checkpoint": "/data/zerovln/artifacts/v5-native-driver-live-20260917-r1/v5_aggregator_untrained.pt"
+    },
+    "v5_native_cached": {
+      "context_encoder_model": "/opt/external/user-e7a01947/Model/Qwen3.6-35B-A3B",
+      "context_aggregator_checkpoint": "/data/zerovln/artifacts/v5-native-driver-live-20260917-r1/v5_aggregator_untrained.pt",
+      "context_image_cache": true
+    }
+  },
+  "splits": {
+    "official_gvln_action_head_p0_v3test100": {
+      "gym_url": "http://127.0.0.1:8945",
+      "auto_start_gym": false
+    }
+  }
+}

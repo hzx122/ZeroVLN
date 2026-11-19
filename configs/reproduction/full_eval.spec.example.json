@@ -1,0 +1,17 @@
+{
+  "root": "/data/zerovln/artifacts/__EXPR__",
+  "commit": "__PUSHED_COMMIT__",
+  "nodes": 4,
+  "purpose": "full",
+  "selection": "/data/zerovln/artifacts/__EXPR__/selection.json",
+  "binding": "/data/zerovln/artifacts/__EXPR__/binding.json",
+  "navigation_data": "/data/shared/groups/mfm/common/anno/vlmevalkit/RynnBrain/data",
+  "dependencies": {
+    "RynnBrain": {
+      "repository": "https://github.com/alibaba-damo-academy/RynnBrain.git",
+      "commit": "40f19547941454835ff5e63c22994da74605cfea",
+      "mirror": "https://github.com/alibaba-damo-academy/RynnBrain.git"
+    }
+  },
+  "renderer_binaries": []
+}

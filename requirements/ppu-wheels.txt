@@ -1,0 +1,13 @@
+# VENDOR WHEELS ONLY. Never install this file from public PyPI.
+# python -m pip install --no-index --find-links "$PPU_WHEELHOUSE" --no-deps -r requirements/ppu-wheels.txt
+# Vendor SDK/PCCL/driver are separate system dependencies; see REQUIREMENTS.md.
+torch==2.9.0
+torchvision==0.24.0
+triton==3.5.0+git4328cd8b
+vllm==0.18.0+ppu2.0.0
+flash-attn==2.7.4.post1
+flash-attn-3==3.0.0b1
+flash_mla==1.0.0
+flashinfer-python==0.5.3
+flash-linear-attention==0.5.0
+causal-conv1d==1.7.0

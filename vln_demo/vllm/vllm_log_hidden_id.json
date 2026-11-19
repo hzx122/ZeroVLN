@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "disable_existing_loggers": false,
+  "formatters": {
+    "vllm": {
+      "class": "vllm.logging_utils.NewLineFormatter",
+      "datefmt": "%m-%d %H:%M:%S",
+      "format": "%(levelname)s %(asctime)s %(name)s:%(lineno)d] %(message)s"
+    }
+  },
+  "handlers": {
+    "vllm_info": {
+      "class": "logging.StreamHandler",
+      "formatter": "vllm",
+      "level": "INFO",
+      "stream": "ext://sys.stdout"
+    },
+    "request_debug": {
+      "class": "logging.StreamHandler",
+      "formatter": "vllm",
+      "level": "DEBUG",
+      "stream": "ext://sys.stdout"
+    }
+  },
+  "filters": {
+    "hide_prompt_token_ids": {
+      "()": "vllm_log_filters.HidePromptTokenIds"
+    }
+  },
+  "loggers": {
+    "vllm": {
+      "handlers": ["vllm_info"],
+      "level": "INFO",
+      "propagate": false
+    },
+    "vllm.entrypoints.logger": {
+      "handlers": ["request_debug"],
+      "level": "DEBUG",
+      "filters": ["hide_prompt_token_ids"],
+      "propagate": false
+    }
+  }
+}

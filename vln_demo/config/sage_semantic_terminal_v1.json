@@ -1,0 +1,44 @@
+{
+  "schema_version": "sage-semantic-terminal-v1",
+  "status": "frozen_for_gate_c_smoke",
+  "frozen_date": "2026-08-20",
+  "calibration_partition": "construction",
+  "scene_split_salt": "sage-capability-scene-holdout-v1",
+  "evaluation_data_used_for_tuning": false,
+  "relation": "object-side/stop-beside",
+  "region_config": {
+    "robot_radius_m": 0.07,
+    "planning_margin_m": 0.03,
+    "max_surface_distance_m": 1.2,
+    "goal_standoff_m": [0.65, 0.9, 1.2],
+    "camera_width": 640,
+    "camera_height": 480,
+    "camera_hfov_deg": 115.0,
+    "camera_height_m": 1.2,
+    "min_bbox_width_px": 32.0,
+    "min_bbox_height_px": 32.0,
+    "min_projected_area_ratio": 0.01
+  },
+  "sensitivity_max_surface_distance_m": [0.9, 1.2, 1.5],
+  "decision": {
+    "rule": "Use the smallest threshold retaining every canonical stance accepted by the tested thresholds; reject a larger tie when it adds proxy overlap or earlier path acceptance.",
+    "selected_max_surface_distance_m": 1.2,
+    "projection_gate": "A cell needs a valid target-facing projection under the canonical camera, but final agent yaw is not constrained.",
+    "marginal_strata_complete": true,
+    "factorial_strata_complete": false,
+    "missing_factorial_strata": [
+      "large/open/without_distractor",
+      "small/open/with_distractor",
+      "small/open/without_distractor",
+      "small/wall_adjacent/without_distractor"
+    ]
+  },
+  "artifacts": {
+    "calibration_json": "/workspace/ZeroVLN/tmp/capability_v3_gate_b5_construction/calibration.json",
+    "calibration_sha256": "25db98d69dcd2e1f1a157828b11408e93673153faa9f249e057045c5d880134b",
+    "visual_metrics_json": "/workspace/ZeroVLN/tmp/capability_v3_gate_b5_construction/visual_metrics.json",
+    "visual_metrics_sha256": "d11c61b0d7cc6fb0e4ce7a282a971401e32206407ab7d46b5b2c9a3104de51eb",
+    "visual_panel_png": "/workspace/ZeroVLN/docs/draw/fig/gate_b5_semantic_region_audit.png",
+    "visual_panel_sha256": "d923bb7b58c75c71327457a2477a0561ec25da8745088d030364bf634e684fac"
+  }
+}

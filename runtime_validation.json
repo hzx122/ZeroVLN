@@ -1,0 +1,132 @@
+{
+  "schema": "anonymous-runtime-validation-v1",
+  "date": "2026-11-19",
+  "environment": {
+    "hardware": "PPU-ZW810E",
+    "python": "3.12.3",
+    "torch": "2.9.0",
+    "transformers": "5.5.4",
+    "vllm": "0.18.0+ppu2.0.0"
+  },
+  "training": {
+    "ok": true,
+    "global_step": 1,
+    "world_size": 4,
+    "global_batch_size": 4,
+    "query_parameter_delta_l2": 1.724437879602192e-06,
+    "action_head_parameter_delta_l2": 0.0017033596523106098,
+    "qwen_audit": {
+      "requires_grad_count": 0,
+      "optimizer_overlap_count": 0,
+      "non_none_grad_count": 0
+    },
+    "mode": "open_loop_action_expert_sft",
+    "loss": 0.8882920145988464,
+    "returncode": 0,
+    "source_ratio": {
+      "sage": 1,
+      "r2r": 1,
+      "rxr": 2
+    },
+    "date": "2026-11-18"
+  },
+  "evaluation": {
+    "complete": true,
+    "ok": true,
+    "returncode": 0,
+    "max_tool_calls": 2,
+    "repeats": 1,
+    "cases": [
+      {
+        "benchmark": "sage-3d",
+        "evaluation_valid": true,
+        "returncode": 0,
+        "calls_used": 2,
+        "steps_used": 14,
+        "path_length_m": 1.4332522598476929,
+        "why": "tool_budget_exhausted",
+        "success": false
+      },
+      {
+        "benchmark": "r2r",
+        "evaluation_valid": true,
+        "returncode": 0,
+        "calls_used": 2,
+        "steps_used": 33,
+        "path_length_m": 3.118778184056282,
+        "why": "tool_budget_exhausted",
+        "success": false
+      },
+      {
+        "benchmark": "rxr",
+        "evaluation_valid": true,
+        "returncode": 0,
+        "calls_used": 2,
+        "steps_used": 17,
+        "path_length_m": 0.926712904125452,
+        "why": "tool_budget_exhausted",
+        "success": false
+      }
+    ],
+    "regression_passed": 77,
+    "date": "2026-11-18"
+  },
+  "limitations": [
+    "Uses existing compatible environment, licensed datasets and model weights; these are external inputs.",
+    "The single-node checks cover one open-loop SFT step and one joint RL step. Multi-step learning, cross-node communication, and navigation performance after RL were not measured.",
+    "Evaluation validates one case per benchmark with a two-tool-call budget, not full benchmark performance.",
+    "NVIDIA execution and clean environment installation were not exercised."
+  ],
+  "joint_rl": {
+    "date": "2026-11-19",
+    "method": "Trajectory-Level RLOO",
+    "scope": "joint",
+    "hardware": "PPU-ZW810E",
+    "nodes": 1,
+    "world_size": 16,
+    "learner_transformers": "5.12.1",
+    "serving_transformers": "5.5.4",
+    "parallelism": {
+      "tp": 2,
+      "pp": 2,
+      "cp": 1,
+      "ep": 4,
+      "etp": 1
+    },
+    "colocated_tp2_replicas": 8,
+    "optimizer_steps": 1,
+    "global_step": 1,
+    "group_size": 2,
+    "groups": 4,
+    "selected_episodes": {
+      "sage": 4,
+      "r2r": 2,
+      "rxr": 2
+    },
+    "max_tool_calls_per_episode": 3,
+    "tool_calls": 23,
+    "action_steps": 167,
+    "all_ranks_finite_once": true,
+    "brain_optimizer_steps_per_rank": 1,
+    "action_head_optimizer_steps_per_rank": 1,
+    "text_grad_norm": 0.4221442917258147,
+    "fm_grad_norm": 45.24285888671875,
+    "joint_grad_norm": 45.2448282795568,
+    "query_parameter_delta_l2": 0.00018096041195842842,
+    "action_head_parameter_delta_l2": 0.005878367916366627,
+    "brain_weight_check": {
+      "parameter": "model.language_model.layers.0.linear_attn.in_proj_qkv.weight",
+      "slice": "[:64, :256]",
+      "changed_elements": 110,
+      "checked_elements": 16384
+    },
+    "rollout_seconds": 130.960491232574,
+    "learner_seconds": 1378.476286875084,
+    "returncode": 0,
+    "checkpoint_committed": true,
+    "latest_checkpoint_step": 1,
+    "full_trainer_state_validated": true,
+    "resumed_training_exercised": false,
+    "next_policy_rollout_exercised": false
+  }
+}

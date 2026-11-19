@@ -1,0 +1,66 @@
+{
+  "version": "english-val-unseen-nested-v1",
+  "stages": {
+    "100": {
+      "file": "100.json",
+      "counts": {
+        "r2r": 100,
+        "rxr": 100
+      }
+    },
+    "200": {
+      "file": "200.json",
+      "counts": {
+        "r2r": 200,
+        "rxr": 200
+      }
+    },
+    "500": {
+      "file": "500.json",
+      "counts": {
+        "r2r": 500,
+        "rxr": 500
+      }
+    },
+    "1000": {
+      "file": "1000.json",
+      "counts": {
+        "r2r": 1000,
+        "rxr": 1000
+      }
+    },
+    "full": {
+      "file": "full.json",
+      "counts": {
+        "r2r": 1839,
+        "rxr": 3669
+      }
+    }
+  },
+  "seed": 20260921,
+  "sources": {
+    "r2r": {
+      "path": "data/datasets/r2r/val_unseen/val_unseen.json.gz",
+      "sha256": "c4e7f32f6f533228148eadf0ffc5e79e4d83055a2fbf14b6b1da393ec5be4974",
+      "episodes": 1839,
+      "unique_routes": 613
+    },
+    "rxr": {
+      "path": "data/datasets/rxr/val_unseen/val_unseen_guide.json.gz",
+      "sha256": "93abddce58e8232867a8738daa8107eb82953693a9d5e70779d1eb00386b222a",
+      "episodes": 3669,
+      "unique_routes": 1223
+    }
+  },
+  "anchor_sha256": "1f23bfaaf82807e1a010fe1c1c8119a0dcf6a91376fc689c402026a93d23084e",
+  "strategy": "Original scene/length-stratified 100; scene-balanced seeded extension, unseen routes first; then other instructions.",
+  "interpretation": "Instruction episodes, not unique routes. Subsets are diagnostic; only full matches the English evaluation pool.",
+  "sha256": {
+    "100.json": "9d74e1b6e27edb9132ddd3aeb75129b9a47c3d35e5c8902997eaccfba0d559be",
+    "1000.json": "15da4fb293a80e330cd84a34e091de1c2c3995498381dba3a7c378a0d7d54a74",
+    "200.json": "2c7f86f80e9aa1c00f0a2d8eb46a2d08a60ab523477914a8b0dc01c3fff95902",
+    "500.json": "2f7c9ebe915ff0eccb70b2f89be813fef5a1d0dad56d524dec46e435d4076bb7",
+    "episodes.jsonl": "3793624c80382a6756a755a4351a74f088584d96d736a1652bd673b15b88291e",
+    "full.json": "fe428d3d11085c102ff40603def2cc809cce4428ce0a35870309e506672d2cbe"
+  }
+}

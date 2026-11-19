@@ -1,0 +1,24 @@
+{
+  "schema": "action_head_runtime_config_v1",
+  "defaults": {
+    "backbone": "/opt/external/user-e7a01947/Model/Qwen3.5-4B",
+    "query_cache": "/tmp/action_head_v43_visual/vllm/queries",
+    "slow_vllm_url": "http://127.0.0.1:28899",
+    "slow_vllm_model": "Qwen3.6-35B",
+    "visible_devices": "11,12",
+    "seed": 20260827
+  },
+  "variants": {
+    "trained_v43_7000": {
+      "checkpoint": "/data/zerovln/artifacts/action-head-v43-official-gvln-d16-l2normfix-from1000-20260912-r5/checkpoints/action-head-v43-official-gvln-d16-l2normfix-from1000-20260912-r5/global_step_007000/action_head",
+      "device": "cuda:0",
+      "visual_device": "cuda:0"
+    }
+  },
+  "splits": {
+    "official_gvln_action_head_p0_v3test100": {
+      "gym_url": "http://127.0.0.1:8938",
+      "auto_start_gym": false
+    }
+  }
+}

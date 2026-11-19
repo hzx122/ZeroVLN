@@ -1,0 +1,47 @@
+# venv / env（机器特定，可重生）
+vln_demo/.venv_fm
+vln_demo/lib
+.venv*/
+venv/
+
+# 生成物
+outputs/
+**/__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.ipynb_checkpoints/
+
+# 编辑器 / 系统
+.DS_Store
+*.swp
+*.swo
+*~
+.efc_*
+
+# TB / 日志（产物，不入仓）
+*.tfevents.*
+/runs/
+
+# 迁移备份（不入仓）
+vln_demo.bak.*/
+
+# claude code 本地状态
+.claude/
+
+
+tmp/
+
+# Local runtime caches and editor merge backups
+/.local_runtime/
+*.orig
+
+# GPU host-specific configuration
+environment.local.sh
+evaluation.smoke.local.json
+
+# Local credentials and test caches
+.env
+.env.*
+!*.example
+.pytest_cache/

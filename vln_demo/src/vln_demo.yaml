@@ -1,0 +1,72 @@
+# @package _global_
+# Demo config: same as RynnBrain config/vln_r2r.yaml but with navid-style
+# simulator params (turn 30 deg, hfov 120, sliding on) and software rendering
+# (gpu_device_id=-1, overridden to llvmpipe via env in the runner).
+
+defaults:
+  - /habitat: habitat_config_base
+  - /habitat/task: vln_r2r
+  - /habitat/simulator/agents@habitat.simulator.agents.main_agent: rgbd_agent
+  - /habitat/dataset/vln: mp3d_r2r
+  - /habitat/task/lab_sensors:
+    - gps_sensor
+    - compass_sensor
+  - _self_
+
+habitat:
+  environment:
+    # 0 是 habitat 的「不限步数」——env.py 的 _past_limit() 整个被
+    # `self._max_episode_steps != 0` 挡住, 所以 episode 永远不会因为步数而 over。
+    # ReAct 驱动要的就是这个: 模型可以一直走, 结束由 MAX_TURNS/工具预算(页面上可调)
+    # 或者上下文塞满决定, 不由一个模型看不见的步数计数器决定。
+    # 经典驱动不受影响: 它的循环自己按 --max_steps 收口(默认 500)。
+    max_episode_steps: 0
+    iterator_options:
+      max_scene_repeat_steps: 50000
+      shuffle: False
+  simulator:
+    agents:
+      main_agent:
+        sim_sensors:
+          rgb_sensor:
+            width: 640
+            height: 480
+            hfov: 120
+            position: [0.0, 1.25, 0.0]
+            orientation: [0.0, 0.0, 0.0]
+          depth_sensor:
+            width: 640
+            height: 480
+            hfov: 120
+            position: [0.0, 1.25, 0.0]
+            orientation: [0.0, 0.0, 0.0]
+            min_depth: 0.0
+            max_depth: 10.0
+            # point/bbox back-projection consumes metric metres. Habitat's
+            # default is normalized [0, 1], which would shrink a 5 m target
+            # to 0.5 m and make R2R/RxR point navigation backend-dependent.
+            normalize_depth: False
+    forward_step_size: 0.25
+    turn_angle: 30
+    habitat_sim_v0:
+      gpu_device_id: -1
+      allow_sliding: True
+  task:
+    measurements:
+      distance_to_goal:
+        type: DistanceToGoal
+        distance_to: POINT
+      success:
+        type: Success
+        success_distance: 3.0
+      spl:
+        type: SPL
+      oracle_success:
+        type: OracleSuccess
+      oracle_navigation_error:
+        type: OracleNavigationError
+  dataset:
+    type: R2RVLN-v1
+    split: val_unseen
+    scenes_dir: data/scene_datasets/
+    data_path: data/datasets/r2r/{split}/{split}.json.gz

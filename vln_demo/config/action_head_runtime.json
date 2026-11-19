@@ -1,0 +1,32 @@
+{
+  "schema": "action_head_runtime_config_v1",
+  "defaults": {
+    "checkpoint": "/data/zerovln/action_head/integration/qwen36_four_query_5001_migration_20260824/action_head",
+    "backbone": "/opt/external/user-e7a01947/Model/Qwen3.5-4B",
+    "query_cache": "/workspace/action_head_query_cache",
+    "slow_vllm_url": "http://127.0.0.1:28899",
+    "slow_vllm_model": "Qwen3.6-35B",
+    "device": "cpu",
+    "visual_device": "cuda:0",
+    "visible_devices": "5",
+    "seed": 20260824
+  },
+  "splits": {
+    "capability": {
+      "gym_url": "http://127.0.0.1:8913"
+    },
+    "demo": {
+      "gym_url": "http://127.0.0.1:8912"
+    },
+    "action_head_train_p0_pilot": {
+      "gym_url": "http://127.0.0.1:8914",
+      "auto_start_gym": true,
+      "gym_port": 8914
+    },
+    "action_head_train_p0_unified": {
+      "gym_url": "http://127.0.0.1:8915",
+      "auto_start_gym": true,
+      "gym_port": 8915
+    }
+  }
+}

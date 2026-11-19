@@ -1,0 +1,22 @@
+{
+  "slow_model": "${SLOW_MODEL}",
+  "fast_backbone": "${FAST_BACKBONE}",
+  "verl_source_root": "${VERL_SOURCE_ROOT}",
+  "published_inputs": "${PUBLISHED_INPUTS}",
+  "published_index": "${PUBLISHED_INDEX}",
+  "initialization": {
+    "base_head_checkpoint": "${BASE_HEAD_CHECKPOINT}",
+    "base_query_checkpoint": "${BASE_QUERY_CHECKPOINT}"
+  },
+  "action_head_as_tool_version": "v8",
+  "source_sampling_ratio": {
+    "sage": 1,
+    "r2r": 1,
+    "rxr": 2
+  },
+  "learning_rate": 5e-05,
+  "fm_prefix_reuse": true,
+  "local_replica_load": true,
+  "checkpoint_stride_epochs": 0.2,
+  "v8_label_profile": "exec4"
+}
