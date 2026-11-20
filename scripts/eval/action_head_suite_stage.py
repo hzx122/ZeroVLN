@@ -218,7 +218,7 @@ def launch_plan(plan, stage, rank, plan_path):
                 environment.pop('LIBGL_DRIVERS_PATH', None)
             environment['RYNNBRAIN_VENV'] = str(GV)
             environment['VLNCE_NAVMESH_ROOT'] = config.get('navmesh_root', '')
-            service('renderer', ['bash', REPO / 'vln_demo/src/remote_habitat/start.sh',
+            service('renderer', ['bash', REPO / 'scripts/demo/remote_habitat/start.sh',
                 '--port', renderer_port, '--host', '127.0.0.1',
                 *(['--scene-cache-size', str(layout['renderer_cache_scenes']),
                     '--render-parallelism', str(layout['render_parallelism']),
@@ -254,7 +254,7 @@ def launch_plan(plan, stage, rank, plan_path):
                        '--tensor-parallel-size', '2', '--dtype', 'bfloat16', '--max-model-len', str(ckpt.get('max_model_len', 128000 if dual else 131072)), '--gpu-memory-utilization', '.60' if primitive and benchmark == 'sage-3d' and index == 7 else '.92',
                        '--max-num-seqs', '64', '--max-num-batched-tokens', '32768', '--allowed-local-media-path', '/']
         else:
-            command = ['bash', REPO / 'vln_demo/vllm/vllm-action-head-query.sh']
+            command = ['bash', REPO / 'scripts/serve/vllm/vllm-action-head-query.sh']
             extra.update(VLLM_MODEL=ckpt['brain'], VLLM_GPUS=f'{2*index},{2*index+1}',
                 VLLM_DTYPE='bfloat16',
                 VLLM_PORT=str(brain_base+index*100),

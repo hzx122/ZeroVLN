@@ -64,7 +64,7 @@ DEMO_BACKEND=lightnav_mujoco \
 DEMO_DEFAULT_DRIVER=lightnav \
 LIGHTNAV_SERVER_URL=ws://127.0.0.1:8050 \
 LIGHTNAV_MUJOCO_URL=http://127.0.0.1:18088 \
-bash vln_demo/src/run_console.sh 5091
+bash scripts/demo/run_console.sh 5091
 ```
 
 `--backend all` 也会尝试挂载它；远端服务不在线时和其它可选 backend 一样打印失败原因并跳过。
@@ -106,7 +106,7 @@ LightNav policy、做可审计的 adapter 对照；它不能声称与 LightNav �
 PYTHONPATH=vln_demo/src pytest -q \
   vln_demo/src/test_lightnav_driver.py \
   vln_demo/src/lightnav_mujoco/test_env.py
-bash vln_demo/src/web/test/run.sh
+bash scripts/test/web/run.sh
 ```
 
 有服务时还应做 live smoke：reset 后左转 10°、前进 0.1 m；当前实测为 10.31° / 0.105 m，

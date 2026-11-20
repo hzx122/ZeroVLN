@@ -1,7 +1,7 @@
 # 主实验唯一默认配置：Trajectory-Level RLOO、完整奖励、联合训练。
 # 使用与 VERL 相同的 Hydra/OmegaConf 配置与 key=value 命令行覆盖。
-# 示例：./run_rloo.sh rloo.credit_level=turn recipe.learning_rate=5e-7
-# 查看配置：./run_rloo.sh --cfg job（加 --resolve 展开环境变量/插值）。
+# 示例：./scripts/train/rloo/run_rloo.sh rloo.credit_level=turn recipe.learning_rate=5e-7
+# 查看配置：./scripts/train/rloo/run_rloo.sh --cfg job（加 --resolve 展开环境变量/插值）。
 defaults:
 - _self_
 - override hydra/job_logging: disabled

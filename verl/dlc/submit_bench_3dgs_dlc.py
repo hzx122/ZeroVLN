@@ -37,7 +37,7 @@ from alibabacloud_pai_dlc20201203.models import (  # noqa: E402
 from workspace_config import build_data_sources, resolve_workspace  # noqa: E402
 from backends import BACKENDS, fields  # noqa: E402
 
-ENTRY = REPO / "verl" / "dlc" / "bench_3dgs_entry.sh"
+ENTRY = REPO / "scripts/cluster/bench_3dgs_entry.sh"
 ARTIFACT_ROOT = Path('/data/zerovln/artifacts')
 
 

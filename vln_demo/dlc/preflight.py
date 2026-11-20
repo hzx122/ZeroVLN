@@ -110,7 +110,7 @@ print("CPU simulator standalone initialization OK")
 ''', str(nav / "src/utils/dist.py")], console_env)
     # Exercise the real service import graph and launcher environment: importing
     # vllm alone missed a datasets/pyarrow failure in the old generic CLI.
-    command("35b-entrypoint", ["bash", str(demo / "vllm/vllm-vln-35B.sh"), "--check"], timeout=240)
+    command("35b-entrypoint", ["bash", str(repo / "scripts/serve/vllm/vllm-vln-35B.sh"), "--check"], timeout=240)
     # The CLI imports its dependency graph from CPFS; a cold metadata cache can
     # take several minutes even though no model or agent session is started.
     command("pi-version", [os.environ["VLN_NODE"], os.environ["VLN_PI_CLI"], "--version"], timeout=600)
@@ -121,19 +121,19 @@ print("CPU simulator standalone initialization OK")
     else:
         command("sglang-import", ["/usr/local/bin/python3", "-c", "import sglang; print(sglang.__version__)"], timeout=240)
     if os.environ.get("VLN_EXTRA_SERVICES") == "1":
-        command("objectnav-entrypoint", ["bash", str(demo / "src/objectnav/start.sh"), "--check"], timeout=300)
+        command("objectnav-entrypoint", ["bash", str(repo / "scripts/demo/objectnav/start.sh"), "--check"], timeout=300)
         for component in ("lightnav", "mujoco"):
-            command(component + "-entrypoint", ["bash", str(demo / "dlc/start_extra.sh"), component, "--check"], timeout=300)
+            command(component + "-entrypoint", ["bash", str(repo / "scripts/demo/dlc/start_extra.sh"), component, "--check"], timeout=300)
         command("lightnav-client", ["/usr/local/bin/python3", "-c", "import websocket; print('websocket-client OK')"])
     # Hash startup code without logging project model configuration or credentials.
-    source_files = [Path(__file__), Path(__file__).with_name("entry.sh"),
-                    Path(__file__).with_name("defaults.sh"),
-                    Path(__file__).with_name("prepare_pi_tools.sh"),
-                    Path(__file__).with_name("attempt.sh"),
-                    Path(__file__).with_name("supervise.py"), demo / "start_all.sh",
-                    demo / "vllm/vllm38next", demo / "vllm/launch_next.py",
-                    demo / "vllm/next_prefix_cache.py", demo / "vllm/vllm-vln-35B.sh",
-                    demo / "src/run_console.sh", demo / "src/vln_model.py",
+    source_files = [Path(__file__), repo / "scripts/demo/dlc/entry.sh",
+                    repo / "scripts/demo/dlc/defaults.sh",
+                    repo / "scripts/demo/dlc/prepare_pi_tools.sh",
+                    repo / "scripts/demo/dlc/attempt.sh",
+                    Path(__file__).with_name("supervise.py"), repo / "scripts/demo/start_all.sh",
+                    repo / "scripts/serve/vllm/vllm38next.sh", demo / "vllm/launch_next.py",
+                    demo / "vllm/next_prefix_cache.py", repo / "scripts/serve/vllm/vllm-vln-35B.sh",
+                    repo / "scripts/demo/run_console.sh", demo / "src/vln_model.py",
                     demo / "src/habitat_topdown.py",
                     demo / "src/sage/env.py",
                     demo / "src/abotn/env.py",
@@ -146,7 +146,7 @@ print("CPU simulator standalone initialization OK")
                     demo / "src/web/js/store.js", demo / "src/web/js/panels/log.js",
                     demo / "src/web/js/panels/instr.js", demo / "src/web/js/panels/terminal.js",
                     demo / "src/remote_habitat/server.py", demo / "src/remote_habitat/client.py",
-                    demo / "src/remote_habitat/start.sh",
+                    repo / "scripts/demo/remote_habitat/start.sh",
                     demo / "src/remote_habitat/policy.py", demo / "src/remote_habitat/worker.py",
                     demo / "src/vln_demo.yaml", demo / "src/agent_tools.py", demo / "src/visual_navigation_tools.py",
                     demo / "src/vlnce_training.py", demo / "src/rxr.py",
@@ -154,8 +154,8 @@ print("CPU simulator standalone initialization OK")
                     demo / "src/lepu/floorplan.png", demo / "src/mall/assets.py",
                     demo / "src/mall/env.py", demo / "src/visual_navigation/planning.py",
                     demo / "src/webui.py", demo / "src/prompts.py",
-                    demo / "dlc/start_extra.sh", demo / "dlc/lightnav_probe.py",
-                    demo / "vllm/sglang-qwen3.8-27B-tp1.sh", demo / "config/pi/project-models.ts"]
+                    repo / "scripts/demo/dlc/start_extra.sh", demo / "dlc/lightnav_probe.py",
+                    repo / "scripts/serve/vllm/sglang-qwen3.8-27B-tp1.sh", demo / "config/pi/project-models.ts"]
     receipt = {"at": datetime.now(timezone.utc).isoformat(), "hostname": socket.gethostname(),
                "image": os.environ.get("DOCKER_IMAGE_URL"), "passed": all(r["passed"] for r in records),
                "checks": records, "source_sha256": {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in source_files if p.exists()}}

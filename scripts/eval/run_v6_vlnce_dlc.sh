@@ -95,7 +95,7 @@ cp -a "$MESA_SEED/." "$MESA_RUNTIME/"
 setsid env LD_LIBRARY_PATH="$GV/lib:$MESA_RUNTIME/lib:$LD_LIBRARY_PATH" \
   __EGL_VENDOR_LIBRARY_FILENAMES="$MESA_RUNTIME/50_mesa.json" LIBGL_DRIVERS_PATH="$MESA_RUNTIME/dri" \
   VLN_RENDER_SCENE_CACHE_SIZE=128 VLN_RENDER_THREADS_PER_WORKER=4 \
-  bash "$REPO/vln_demo/src/remote_habitat/start.sh" --port 7040 \
+  bash "$REPO/scripts/demo/remote_habitat/start.sh" --port 7040 \
   >"$OUTPUT/logs/habitat_render.log" 2>&1 &
 PIDS+=("$!")
 wait_ready "$VLN_HABITAT_RENDER_URL/health" "${PIDS[-1]}" "$OUTPUT/logs/habitat_render.log"
@@ -151,7 +151,7 @@ launch_brain() {
     TRITON_CACHE_DIR="$cache/triton" XDG_CACHE_HOME="$cache/xdg" \
     VLLM_MAX_MODEL_LEN_OVERRIDE=131072 VLLM_MAX_NUM_SEQS_OVERRIDE=64 \
     VLLM_MAX_NUM_BATCHED_TOKENS_OVERRIDE=32768 VLLM_GPU_MEMORY_UTILIZATION_OVERRIDE=0.92 \
-    bash "$SWEEP/launch_vllm_for_ckpt.sh"
+    bash "$REPO/scripts/eval/qwen36_4query_ckpt_sweep/launch_vllm_for_ckpt.sh"
 }
 for replica in $(seq 0 5); do PID_FILES+=("$RUNTIME/vllm_$replica.pid"); done
 export -f launch_brain

@@ -15,7 +15,7 @@ from pathlib import Path
 
 REPO = Path("/workspace/ZeroVLN")
 HERE = REPO / "verl/scripts/train/action_head_bootstrap"
-TRAIN_ENTRY = REPO / "verl/scripts/train/action_head_dualvln_sft/entry.sh"
+TRAIN_ENTRY = REPO / "scripts/train/action_head_dualvln_sft/entry.sh"
 PYTHON = Path("/usr/local/bin/python3.12")
 STEP_RE = re.compile(r"global_step_(\d+)$")
 
@@ -161,7 +161,7 @@ def main() -> None:
     if args.nodes > 1 and os.environ.get("MASTER_ADDR", "") in ("", "127.0.0.1", "localhost"):
         raise RuntimeError("multi-node loop requires DLC MASTER_ADDR")
     required_entries = (
-        HERE / "v3_collect_entry.sh",
+        REPO / "scripts/train/action_head_bootstrap/v3_collect_entry.sh",
         HERE / "merge_v3_corrections.py",
         REPO / "verl/sft/collect_noncollision_option_corrections.py",
         REPO / "verl/sft/mix_action_head_bootstrap.py",
@@ -256,7 +256,7 @@ def main() -> None:
                 "BOOTSTRAP_NODE_INDEX": str(node_rank),
                 "BOOTSTRAP_NODE_COUNT": str(args.nodes),
             })
-            run(["bash", str(HERE / "v3_collect_entry.sh"),
+            run(["bash", str(REPO / "scripts/train/action_head_bootstrap/v3_collect_entry.sh"),
                  "--action-head-as-tool-version", args.action_head_as_tool_version,
                  "--bootstrap-round", str(round_index)], env=env)
 

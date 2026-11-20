@@ -149,7 +149,7 @@ def assert_independent_request(directory, plan):
     profile = 'next' if model_choice(plan['model']).get('gateway') else plan['model']
     if ('export VLN_AGENT_MODEL_PROFILE='+profile+'\n') not in request['userCommand']:
         raise ValueError('service model profile mismatch')
-    if str(REPO/'vln_demo/dlc/entry.sh') not in request['userCommand']:
+    if str(REPO/'scripts/demo/dlc/entry.sh') not in request['userCommand']:
         raise ValueError('full render/controller deployment entry is required')
 
 

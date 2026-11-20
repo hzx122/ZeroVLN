@@ -20,7 +20,7 @@ Stages (each writes an intermediate artifact so it can be rerun alone):
 
 Run with the canonical config (no overrides)::
 
-    bash vln_demo/run_demo_episodes.sh
+    bash scripts/demo/run_demo_episodes.sh
 
 Experiment wrappers may pass only changed dotted keys with ``--set``. The
 default production contract lives in ``vln_demo/config/sage_demo_pipeline.yaml``.

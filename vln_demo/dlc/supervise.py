@@ -633,20 +633,20 @@ class Supervisor:
             self.write_status("starting")
             ports = tuple(p for p in PORTS if p != 9038) + (self.agent_spec["port"],) if self.agent_spec else PORTS
             check_ports_free((*ports, 7041, 8050, 18088) if self.extra_services else ports)
-            self.spawn("habitat_render", ["bash", str(REPO / "vln_demo/src/remote_habitat/start.sh")],
+            self.spawn("habitat_render", ["bash", str(REPO / "scripts/demo/remote_habitat/start.sh")],
                        env=standalone_sim_env(self.env))
             if self.agent_spec:
                 model_env = dict(self.env, CUDA_VISIBLE_DEVICES="4,5,6,7,8,9,10,11")
                 self.spawn("next", ["/usr/local/bin/python3", "-u", str(REPO/"vln_demo/vllm/sglang_server.py"),
                            "--profile", self.agent_profile, "--run-dir", str(Path(self.status["run_root"])/"agent-model")], env=model_env)
             else:
-                self.spawn("next", ["bash", str(REPO / "vln_demo/vllm/vllm38next")])
-            self.spawn("model_35b", ["bash", str(REPO / "vln_demo/vllm/vllm-vln-35B.sh")])
+                self.spawn("next", ["bash", str(REPO / "scripts/serve/vllm/vllm38next.sh")])
+            self.spawn("model_35b", ["bash", str(REPO / "scripts/serve/vllm/vllm-vln-35B.sh")])
             if self.extra_services:
                 sim_env = standalone_sim_env(self.env)
-                self.spawn("objectnav_render", ["bash", str(REPO / "vln_demo/src/objectnav/start.sh")], env=sim_env)
+                self.spawn("objectnav_render", ["bash", str(REPO / "scripts/demo/objectnav/start.sh")], env=sim_env)
                 for component in ("lightnav", "mujoco"):
-                    self.spawn(component, ["bash", str(REPO / "vln_demo/dlc/start_extra.sh"), component], env=sim_env)
+                    self.spawn(component, ["bash", str(REPO / "scripts/demo/dlc/start_extra.sh"), component], env=sim_env)
                 # Register MuJoCo before console initialization builds its catalog.
                 deadline = time.monotonic() + 300
                 while not self.stop_event.is_set():
@@ -661,7 +661,7 @@ class Supervisor:
                     self.stop_event.wait(3)
                 if self.stop_event.is_set():
                     raise RuntimeError("startup interrupted")
-            self.spawn("start_all", ["bash", str(REPO / "vln_demo/start_all.sh"), "start"],
+            self.spawn("start_all", ["bash", str(REPO / "scripts/demo/start_all.sh"), "start"],
                        env=standalone_sim_env(self.env))
             self.monitor()
             state = "stopped"

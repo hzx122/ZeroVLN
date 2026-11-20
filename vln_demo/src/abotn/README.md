@@ -4,8 +4,8 @@
 渲染服务，但走法不一样——这些场景没有 navmesh，自带的是一张占据栅格图，所以
 `abotn/occmap.py` 自己做运动学，`abotn/env.py` 把它包成 `habitat.Env` 的形状。
 
-    ./src/run_console.sh 5000                   # 七套资产全挂（默认）
-    DEMO_BACKEND=poi ./src/run_console.sh 5000  # 只挂 POIBench
+    ./scripts/demo/run_console.sh 5000                   # 七套资产全挂（默认）
+    DEMO_BACKEND=poi ./scripts/demo/run_console.sh 5000  # 只挂 POIBench
 
 页面上先选「资产集」再选场景。
 

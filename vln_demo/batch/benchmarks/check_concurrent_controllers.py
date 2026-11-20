@@ -60,7 +60,7 @@ def main():
                 PYTHONDONTWRITEBYTECODE='1')
             for key in ('RANK','WORLD_SIZE','LOCAL_RANK','MASTER_ADDR','MASTER_PORT','LOCAL_WORLD_SIZE'):
                 env.pop(key,None)
-            command = ['bash', str(runner.REPO/'vln_demo/src/run_console.sh'),str(port),'--split','train',
+            command = ['bash', str(runner.REPO/'scripts/demo/run_console.sh'),str(port),'--split','train',
                        '--scene',('rxr-' if row['dataset']=='rxr' else '')+row['scene'],
                        '--episode_id',row['episode_id'],'--out',str(output)]
             with (output/'console.log').open('w') as log:

@@ -67,7 +67,7 @@ def validate_inputs(checkpoint=None, ladder_stage='full'):
             REPO / 'verl/scripts/eval/qwen36_4query_ckpt_sweep/closedloop_eval.py',
             REPO / 'verl/scripts/train/action_head_bootstrap/case_scheduler.py',
             REPO / 'vln_demo/batch/model_gateway.py',
-            REPO / 'vln_demo/vllm/vllm-action-head-query.sh',
+            REPO / 'scripts/serve/vllm/vllm-action-head-query.sh',
             REPO / 'vln_demo/vllm/vllm_log_hidden_id.json',
             REPO / 'vln_demo/src/verl_access/bench_client.py',
             REPO / 'vln_demo/src/vln_gym/client.py',

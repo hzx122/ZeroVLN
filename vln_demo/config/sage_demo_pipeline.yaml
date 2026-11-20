@@ -1,5 +1,5 @@
 # Sage-3D self-built episode production contract.
-# `bash vln_demo/run_demo_episodes.sh` consumes this file without overrides.
+# `bash scripts/demo/run_demo_episodes.sh` consumes this file without overrides.
 # Experiments must use a separate wrapper and override only changed dotted keys.
 
 pipeline:

@@ -24,11 +24,11 @@ These optional resources are external to this package.
 
 ## Required environment and external inputs
 
-- `run_rloo.sh` invokes the included `action_head_rl.trainer`. It requires the
+- `scripts/train/rloo/run_rloo.sh` invokes the included `action_head_rl.trainer`. It requires the
   configured VERL source (`VERL_SOURCE_ROOT`), Megatron Core and Bridge
   (`MEGATRON_ENV`), compatible PyTorch/accelerator packages, Ray, checkpoints,
   manifests, and reachable Gym services. See `REQUIREMENTS.md` and
-  `configs/gpu/environment.example.sh`. The reference joint-RL run used VERL
+  `scripts/env/environment.example.sh`. The reference joint-RL run used VERL
   revision `b213f118f8df230bc97f68cdc56043623c6babdb`. The Megatron path
   imports `accepts_packed_thd_vlm_inputs` and `preprocess_thd_engine` from
   `verl.models.mcore.util`; an installation used for open-loop SFT alone can
@@ -37,13 +37,13 @@ These optional resources are external to this package.
   Set `MP3D_HOUSE_ROOT` for the Gym processes to the directory containing
   `<scene>/<scene>.house`. The R2R/RxR information reward reads object
   annotations from these files at episode reset.
-- `run_rl_services.sh`, `run_evaluation.sh`, and `run_navigation.sh` use the
+- `scripts/train/rloo/run_rl_services.sh`, `scripts/eval/run_evaluation.sh`, and `scripts/eval/run_navigation.sh` use the
   included CPU renderer in `third_party/abot_renderer` and an installed
   navigation environment/data tree (`RYNNBRAIN_NAV_DIR`). Habitat and the
   licensed scene, mesh, navmesh, semantic, and benchmark inputs remain external.
-- `run_openloop.sh` requires the training environment, base model/visual weights,
+- `scripts/train/run_openloop.sh` requires the training environment, base model/visual weights,
   prepared trajectory data, and initialization inputs specified by its config.
-- `run_collection.sh` requires a prepared JSON plan and the plan's model,
+- `scripts/train/run_collection.sh` requires a prepared JSON plan and the plan's model,
   renderer, navigation, and service inputs. It does not synthesize missing data.
 Set paths for the target machine; `/workspace`, `/data/zerovln`, and
 `/opt/external` are example locations. Legacy platform job submission and

@@ -243,7 +243,7 @@ def sleep_worker(args, runtime):
         if args.target.resolve() == Path(provenance['model']).resolve():
             raise ValueError('changed-weight target must differ from initial model')
         paths = [Path(__file__), REPO / 'scripts/eval/action_head_d16_sleep_weight_audit.py',
-                 REPO / 'verl/action_head_rl/vllm_service.py', REPO / 'vln_demo/vllm/vllm-vln-35B.sh']
+                 REPO / 'verl/action_head_rl/vllm_service.py', REPO / 'scripts/serve/vllm/vllm-vln-35B.sh']
         report['source_sha256'] = {str(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
         report['input_provenance'] = provenance
         report['target_config_sha256'] = hashlib.sha256((args.target / 'config.json').read_bytes()).hexdigest()

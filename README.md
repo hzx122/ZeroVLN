@@ -27,30 +27,30 @@ Joint RL raises the success rate from **36.9% to 51.3%** on SAGE-3D, **17.0% to 
 | Watch or evaluate a checkpoint | Brain, action-expert checkpoint and benchmark scenes | [Browser console](#browser-console) · [Closed-loop evaluation](#closed-loop-evaluation) |
 | Run your own policy across interaction rounds | Reachable training Gym and an episode from the case manifest | [Start the Gym](#training-gym-and-http-client) · [Python client example](#drive-a-gym-session-from-an-rl-worker) |
 | Collect supervision and train the action expert | A collection plan for the planner, or published trajectories and indices for training | [Collect reference trajectories](#reference-trajectory-collection) · [Initialize the expert](#action-expert-initialization) |
-| Jointly optimize the brain and expert | Initialized expert, base brain, training cases and Gym services | [One update on 16 devices](RUNTIME_VALIDATION.md#one-joint-rl-update-on-16-devices) · [Full recipe](#joint-reinforcement-learning) |
+| Jointly optimize the brain and expert | Initialized expert, base brain, training cases and Gym services | [16-device deployment](RUNTIME_VALIDATION.md#one-joint-rl-update-on-16-devices) · [Full recipe](#joint-reinforcement-learning) |
 
 ## Quick start
 
-**1. Download the step-152 checkpoint.** The [ZeroVLN weights on Hugging Face](https://huggingface.co/hzxllll/ZeroVLN/tree/680302ef1263268531a9f22c5b1c3965782ea674) contain the jointly trained brain, action expert and learnable query embeddings (70.4 GB). On a configured host, run the following in Bash from the ZeroVLN repository root. First complete [environment setup](#environment-setup) and set the benchmark asset paths and `FAST_BACKBONE` in `environment.local.sh`. The expert uses a separate frozen Qwen3.5-4B visual backbone. Set `FAST_BACKBONE` to your local copy.
+**1. Download the ZeroVLN model.** The [ZeroVLN weights on Hugging Face](https://huggingface.co/hzxllll/ZeroVLN/tree/feebe03ffc987e034fc9b1fb4f15774f83a2d9dc) contain the jointly trained brain, action expert and learnable query embeddings (70.4 GB). On a configured host, run the following in Bash from the ZeroVLN repository root. First complete [environment setup](#environment-setup) and set the benchmark asset paths and `FAST_BACKBONE` in `scripts/env/environment.local.sh`. The expert uses a separate frozen Qwen3.5-4B visual backbone. Set `FAST_BACKBONE` to your local copy.
 
 ```bash
-source ./environment.local.sh
+source ./scripts/env/environment.local.sh
 export PATH="$(dirname "$PYTHON"):$PATH"
-export INITIAL_CHECKPOINT="$RL_ARTIFACT_ROOT/checkpoints/global_step_000152"
+export INITIAL_CHECKPOINT="$RL_ARTIFACT_ROOT/checkpoints/ZeroVLN"
 
 # With the Hugging Face CLI installed, sign in using an account with read access.
 hf auth login
-hf download hzxllll/ZeroVLN --revision 680302ef1263268531a9f22c5b1c3965782ea674 \
+hf download hzxllll/ZeroVLN --revision feebe03ffc987e034fc9b1fb4f15774f83a2d9dc \
   --local-dir "$INITIAL_CHECKPOINT"
 "$PYTHON" scripts/prepare_checkpoint.py "$INITIAL_CHECKPOINT"
 ```
 
-**2. Load the checkpoint and watch an episode.** Keep the directory name `global_step_000152`. The evaluator reads the downloaded `report.json` and serves the trained brain from `qwen/`. The action expert and learnable queries are distributed in `action_head/` and `learnable_query/`. The preparation command links the query file into the runtime’s expected layout. In the same shell, select the matching training configuration and start the console with a fresh output directory:
+**2. Load the checkpoint and watch an episode.** The evaluator reads the downloaded `report.json` and serves the trained brain from `qwen/`. The action expert and learnable queries are distributed in `action_head/` and `learnable_query/`. The preparation command links the query file into the runtime’s expected layout. In the same shell, select the matching training configuration and start the console with a fresh output directory:
 
 ```bash
 export SLOW_MODEL="$INITIAL_CHECKPOINT/qwen"
 export TRAINING_CONFIG="$INITIAL_CHECKPOINT/training_config.json"
-./run_navigation.sh --config configs/gpu/evaluation.json \
+./scripts/eval/run_navigation.sh --config configs/gpu/evaluation.json \
   --output-dir "$RL_ARTIFACT_ROOT/navigation-console" --port 5002
 ```
 
@@ -135,7 +135,7 @@ Use the **HTTP Gym** when a policy drives the same task programmatically. Create
 
 | Component | Role | Implementation |
 | --- | --- | --- |
-| Environment services | Render observations, advance the simulator, and score interactions | [Gym service launcher](run_rl_services.sh) |
+| Environment services | Render observations, advance the simulator, and score interactions | [Gym service launcher](scripts/train/rloo/run_rl_services.sh) |
 | Rollout workers | Keep episode state across calls and collect trajectories from the brain and expert | [Rollout worker](verl/action_head_rl/rollout.py) |
 | Brain inference | Serve the VLM for tool decisions during rollout | [vLLM service](verl/action_head_rl/vllm_service.py) |
 | Joint learner | Coordinate distributed updates to the brain and expert and save their training state | [Trainer](verl/action_head_rl/trainer.py) · [Megatron worker](verl/action_head_rl/megatron_worker.py) |
@@ -170,7 +170,7 @@ The recorded hardware runs used Linux on PPU-ZW810E, Python 3.12.3, PyTorch 2.9.
 git clone https://github.com/hzx122/ZeroVLN.git
 cd ZeroVLN
 export REPO="$PWD"
-cp configs/gpu/environment.example.sh environment.local.sh
+cp scripts/env/environment.example.sh scripts/env/environment.local.sh
 ```
 
 **Install two Python environments.** The training interpreter runs the launcher, model and learner. The simulation interpreter runs Habitat, Mesa/EGL, and the navigation services with NumPy 1.26.4. For a new PPU host, install the matching driver, SDK and PCCL first, obtain the matching vendor wheelhouse, and install the Ubuntu build and EGL packages listed in the [installation guide](REQUIREMENTS.md). With the SDK activated, the core Python installation is:
@@ -197,16 +197,16 @@ Install the vendor runtime dependencies and the compatible Habitat-Sim, Habitat-
 <details>
 <summary>Set model and dataset paths and verify the interpreters</summary>
 
-**Configure the host.** Edit the absolute paths in `environment.local.sh`. Set `PYTHON` to the training interpreter above and `RYNNBRAIN_VENV` to the demo environment directory. Install the external source trees and supply the inputs used by your workflow:
+**Configure the host.** Edit the absolute paths in `scripts/env/environment.local.sh`. Set `PYTHON` to the training interpreter above and `RYNNBRAIN_VENV` to the demo environment directory. Install the external source trees and supply the inputs used by your workflow:
 
 - **Navigation assets.** Set `RYNNBRAIN_NAV_DIR` to the RynnBrain `navigation/` checkout with its `data/` tree, R2R/RxR episodes and licensed Matterport3D scenes under `data/scene_datasets/mp3d/`. For SAGE, set `SAGE_ROOT` to the dataset containing `SAGE-3D_VLN_Data` and `InteriorGS`, `SAGE_SCENES_ROOT` to the converted Gaussian scenes, and `SAGE_USD_COLLISION_MASK_ROOT` to the collision masks. Evaluation also reads `SAGE_MANIFEST`, `SAGE_PROTOCOL_ROOT` and `NAVMESH_ROOT`.
-- **Model and checkpoint.** Set `SLOW_MODEL` to the Qwen3.6-35B-A3B brain and `FAST_BACKBONE` to the Qwen3.5-4B visual backbone. Set `INITIAL_CHECKPOINT` to the selected step directory containing the action expert and learnable query weights, and `TRAINING_CONFIG` to its matching experiment configuration. See the evaluation step below when selecting a jointly trained brain.
+- **Model and checkpoint.** Set `SLOW_MODEL` to the Qwen3.6-35B-A3B brain and `FAST_BACKBONE` to the Qwen3.5-4B visual backbone. Set `INITIAL_CHECKPOINT` to the checkpoint directory containing the action expert and learnable query weights, and `TRAINING_CONFIG` to its matching experiment configuration. See the evaluation step below when selecting a jointly trained brain.
 - **Training source and data.** Set `VERL_SOURCE_ROOT` to the upstream VERL checkout for that stage. The recorded revisions differ between expert initialization and joint RL. For joint RL also install Megatron Core and Bridge under `MEGATRON_ENV/mcore` and `MEGATRON_ENV/bridge/src`. The exact VERL revisions and required APIs are in the [dependency notes](DEPENDENCIES.md). The stage-specific data inputs are listed below.
 
 Source the file in each new shell. These lightweight checks verify interpreter selection, accelerator visibility and simulator imports before you start services:
 
 ```bash
-source ./environment.local.sh
+source ./scripts/env/environment.local.sh
 export PATH="$(dirname "$PYTHON"):$PATH"
 mkdir -p "$RL_ARTIFACT_ROOT" "$GPU_CACHE_ROOT"
 "$PYTHON" -c 'import torch; print(torch.__version__, torch.cuda.device_count())'
@@ -216,6 +216,8 @@ mkdir -p "$RL_ARTIFACT_ROOT" "$GPU_CACHE_ROOT"
 </details>
 
 ## Workflow deployment
+
+Use the shell launchers under `scripts/train/` for collection and training, `scripts/eval/` for evaluation and navigation, and `scripts/env/` for host configuration. Under `scripts/train/rloo/`, `sequence/` contains the trajectory-level recipes and `turn/` contains the round-level recipes.
 
 Run each launcher from the repository root with the host environment sourced. Expand a task for its required inputs, commands and expected outputs.
 
@@ -228,8 +230,8 @@ On the collection host, supply a prepared supervisor plan for the desired source
 
 ```bash
 : "${COLLECTION_PLAN:?Set the absolute path to your prepared collection plan JSON}"
-./run_collection.sh --plan "$COLLECTION_PLAN" --show-config
-./run_collection.sh --plan "$COLLECTION_PLAN"
+./scripts/train/run_collection.sh --plan "$COLLECTION_PLAN" --show-config
+./scripts/train/run_collection.sh --plan "$COLLECTION_PLAN"
 ```
 
 The supervisor waits for service health checks before starting collectors. Inspect the workers’ per-case outputs, then look for `status: complete` in `completion.json` beside the plan and exit code zero in `launch/gpu-collection.json`. The next stage consumes a published three-source manifest and per-source indices. Raw collection directories alone do not satisfy that input format.
@@ -246,14 +248,14 @@ Use the [open-loop configuration](configs/gpu/openloop.json). Set `PUBLISHED_INP
 ```bash
 out="$RL_ARTIFACT_ROOT/openloop"
 # Run once on node 0 with a fresh output path.
-./run_openloop.sh prepare --output-dir "$out"
-./run_openloop.sh initialize --output-dir "$out"
+./scripts/train/run_openloop.sh prepare --output-dir "$out"
+./scripts/train/run_openloop.sh initialize --output-dir "$out"
 # Then run on each node. Use its own NODE_RANK and the same node-0 MASTER_IP.
-./run_openloop.sh run --output-dir "$out" --node-rank "${NODE_RANK:?}" \
+./scripts/train/run_openloop.sh run --output-dir "$out" --node-rank "${NODE_RANK:?}" \
   --master-addr "${MASTER_IP:?}" --master-port 29561
 ```
 
-The default layout uses four nodes with 16 devices each. For a first deployment, the [four-device, one-update recipe](RUNTIME_VALIDATION.md#bounded-action-expert-training) uses real trajectories. Check `launch/run-node<RANK>.json` for exit code zero and the selected step’s `report.json` for the parameter changes and frozen-brain audit. For joint RL, set `INITIAL_CHECKPOINT` to that step under `checkpoints/<run-name>/`; retain `experiment_config.json` for evaluation.
+The default layout uses four nodes with 16 devices each. For a first deployment, the [four-device training recipe](RUNTIME_VALIDATION.md#bounded-action-expert-training) uses real trajectories. Check `launch/run-node<RANK>.json` for exit code zero and the checkpoint’s `report.json` for the parameter changes and frozen-brain audit. For joint RL, set `INITIAL_CHECKPOINT` to that checkpoint under `checkpoints/<run-name>/`; retain `experiment_config.json` for evaluation.
 
 </details>
 
@@ -273,12 +275,12 @@ export EXPR_NAME=gym-demo TRAIN_GYMS=8 TRAIN_PORT_BASE=24850
 export RENDER_PORT=24840 CPU_RENDER_PORT=24841
 export BENCH_URLS=$(printf 'http://127.0.0.1:%s,' {24850..24857})
 export BENCH_URLS=${BENCH_URLS%,}
-./run_rl_services.sh run.mode=start
-./run_rl_services.sh run.mode=status
+./scripts/train/rloo/run_rl_services.sh run.mode=start
+./scripts/train/rloo/run_rl_services.sh run.mode=status
 curl -fsS http://127.0.0.1:24850/spec
 ```
 
-Once status reports `ready: true`, run the [reset, step and close example](#drive-a-gym-session-from-an-rl-worker) in the same environment. A working session returns a new observation, reward and termination flags after a turn. Run `./run_rl_services.sh run.mode=stop` with the same environment when finished. Remote workers need the simulator host’s reachable address in `BENCH_URLS`.
+Once status reports `ready: true`, run the [reset, step and close example](#drive-a-gym-session-from-an-rl-worker) in the same environment. A working session returns a new observation, reward and termination flags after a turn. Run `./scripts/train/rloo/run_rl_services.sh run.mode=stop` with the same environment when finished. Remote workers need the simulator host’s reachable address in `BENCH_URLS`.
 
 </details>
 
@@ -287,7 +289,7 @@ Once status reports `ready: true`, run the [reset, step and close example](#driv
 <details>
 <summary>Ray cluster, Gym services and joint learner</summary>
 
-Start with the initialized action expert, base brain, training manifest and Gym assets above. For one PPU node, use the complete [16-device, one-update recipe](RUNTIME_VALIDATION.md#one-joint-rl-update-on-16-devices). It launches eight Gyms, creates a local Ray runtime, samples four pairs of trajectories and saves a joint checkpoint. The following commands deploy the full [Trajectory-Level RLOO configuration](configs/gpu/rloo.yaml), which defaults to eight 16-device nodes and 512 rollout workers.
+Start with the initialized action expert, base brain, training manifest and Gym assets above. For one PPU node, use the complete [16-device training recipe](RUNTIME_VALIDATION.md#one-joint-rl-update-on-16-devices). It launches eight Gyms, creates a local Ray runtime, samples four pairs of trajectories and saves a joint checkpoint. The following commands deploy the full [Trajectory-Level RLOO configuration](configs/gpu/rloo.yaml), which defaults to eight 16-device nodes and 512 rollout workers.
 
 1. Activate the same training environment on all nodes. Use an existing Ray cluster spanning the allocated hosts, or start Ray on the head and then join the other nodes. Set `MASTER_IP` to the head node’s reachable IP on all hosts. If starting a new cluster, run `ray start --head --node-ip-address="$MASTER_IP" --port=6379` on the head and `ray start --address="$MASTER_IP:6379"` on each worker. Confirm all eight nodes appear in `ray status` on the head.
 2. Start local services on **each** node. Use the same experiment name and method settings everywhere. Give each node its own service output directory on shared storage. The default service ports are 8950–9013 for 64 Gyms per node.
@@ -298,8 +300,8 @@ Start with the initialized action expert, base brain, training manifest and Gym 
 export EXPR_NAME=trajectory-rloo TRAIN_GYMS=64 TRAIN_PORT_BASE=8950
 export RAY_ADDRESS="${MASTER_IP:?}:6379"
 export SERVICES_OUTPUT_DIR="$RL_ARTIFACT_ROOT/$EXPR_NAME-services-node${NODE_RANK:?}"
-./run_rl_services.sh run.mode=start
-./run_rl_services.sh run.mode=status
+./scripts/train/rloo/run_rl_services.sh run.mode=start
+./scripts/train/rloo/run_rl_services.sh run.mode=status
 
 # On the head only, after all service groups are ready.
 : "${GYM_HOSTS_FILE:?Set the path to the eight-host text file}"
@@ -314,11 +316,11 @@ print(",".join(f"http://{host}:{port}" for host in hosts for port in range(8950,
 PYTHON
 )
 export BENCH_URLS
-./run_rloo.sh --cfg job --resolve
-./run_rloo.sh "run.output_dir=$RL_ARTIFACT_ROOT/$EXPR_NAME"
+./scripts/train/rloo/run_rloo.sh --cfg job --resolve
+./scripts/train/rloo/run_rloo.sh "run.output_dir=$RL_ARTIFACT_ROOT/$EXPR_NAME"
 ```
 
-Check `train/rollouts.jsonl` for sampled episodes, `train/training_updates.jsonl` for optimizer steps from both policies, and `train/metrics.jsonl` plus the step checkpoint for persistence. After training, run `./run_rl_services.sh run.mode=stop` on each node with its original service settings. The recorded 16-device check covers one update. The full multi-node schedule has not been validated in this release.
+Check `train/rollouts.jsonl` for sampled episodes, `train/training_updates.jsonl` for optimizer steps from both policies, and `train/metrics.jsonl` and the saved checkpoint for persistence. After training, run `./scripts/train/rloo/run_rl_services.sh run.mode=stop` on each node with its original service settings. The full multi-node schedule has not been validated in this release.
 
 </details>
 
@@ -327,16 +329,16 @@ Check `train/rollouts.jsonl` for sampled episodes, `train/training_updates.jsonl
 <details>
 <summary>Checkpoint selection, launch commands and metrics</summary>
 
-Use the [evaluation selection](configs/gpu/evaluation.json). Each checkpoint entry binds the action expert and query (`path`), its `training_config`, and the actual brain weights (`brain`). For ZeroVLN (Init), use the base brain. For a full joint-RL step, use the exported `qwen/` directory from **that same step** as `brain`. With the supplied selection template this means setting `SLOW_MODEL="$INITIAL_CHECKPOINT/qwen"` in the evaluation shell after choosing the joint step. The console reads the same selection.
+Use the [evaluation selection](configs/gpu/evaluation.json). Each checkpoint entry binds the action expert and query (`path`), its `training_config`, and the actual brain weights (`brain`). For ZeroVLN (Init), use the base brain. For joint RL, set `brain` to the `qwen/` directory exported with the selected action expert. With the supplied selection template this means setting `SLOW_MODEL="$INITIAL_CHECKPOINT/qwen"` in the evaluation shell after choosing the checkpoint. The console reads the same selection.
 
 For an initial check, follow the [two-device evaluation recipe](RUNTIME_VALIDATION.md#one-navigation-case-per-benchmark). It runs one real episode per benchmark and writes `smoke/smoke-summary.json`; both `complete` and `ok` must be true. For the default full selection, use four nodes, four repeats and a budget of 200 tool calls:
 
 ```bash
 out="$RL_ARTIFACT_ROOT/evaluation"
 # On node 0, once, before any worker starts.
-./run_evaluation.sh prepare --config configs/gpu/evaluation.json --output-dir "$out"
+./scripts/eval/run_evaluation.sh prepare --config configs/gpu/evaluation.json --output-dir "$out"
 # On every configured node, using the same selection and shared output path.
-./run_evaluation.sh run --config configs/gpu/evaluation.json \
+./scripts/eval/run_evaluation.sh run --config configs/gpu/evaluation.json \
   --output-dir "$out" --rank "${NODE_RANK:?}"
 ```
 

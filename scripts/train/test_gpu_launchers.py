@@ -199,7 +199,7 @@ def test_yaml_defaults_drive_both_trainer_and_services(inputs,monkeypatch):
 
 
 def test_shell_cli_uses_hydra_and_user_override_wins():
-    script=gpu_runtime.REPO/'run_rloo_turn_no_information.sh'
+    script=gpu_runtime.REPO/'scripts/train/rloo/turn/run_rloo_turn_no_information.sh'
     output=subprocess.check_output([str(script),'rloo.information_reward_coefficient=0.3','--cfg','job'],text=True)
     cfg=OmegaConf.create(output)
     assert cfg.rloo.credit_level == 'turn'
@@ -215,7 +215,7 @@ def test_native_hydra_cli_prepare_and_custom_yaml_are_source_of_defaults(inputs)
     config_dir.mkdir()
     OmegaConf.save(yaml,config_dir/'experiment.yaml')
     output=inputs/'cli-run'
-    result=subprocess.run([str(gpu_runtime.REPO/'run_rloo.sh'),
+    result=subprocess.run([str(gpu_runtime.REPO/'scripts/train/rloo/run_rloo.sh'),
         '--config-path',str(config_dir),'--config-name','experiment',
         'run.mode=prepare',f'run.output_dir={output}',
         'rloo.credit_level=turn'],cwd=inputs,text=True,capture_output=True)

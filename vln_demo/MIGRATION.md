@@ -161,11 +161,11 @@ export DEMO_OUTPUT_PATH=$OUT
 ```bash
 # 0) 系统 mesa 装好(§3) + gordon venv / NAV / 数据 / ckpt 在位
 # 1) 起 vLLM(后台, 等 /health 200, 约 5min warmup)
-bash /workspace/vln_demo/vllm/vllm-vln-2B.sh > /tmp/vllm.log 2>&1 &
+bash /workspace/scripts/serve/vllm/vllm-vln-2B.sh > /tmp/vllm.log 2>&1 &
 # 轮询: while ! curl -s http://127.0.0.1:28898/health; do sleep 5; done
 
 # 2) 跑 demo(3 episode, ~3-6min)
-BACKEND=2B bash /workspace/vln_demo/run_demo_ext.sh
+BACKEND=2B bash /workspace/scripts/demo/run_demo_ext.sh
 # 或 35B: BACKEND=35B bash run_demo_ext.sh (先起 vllm-vln-35B.sh)
 
 # 3) 产出在 DEMO_OUTPUT_PATH(默认 outputs/run_ext_<ts>/):

@@ -1,10 +1,10 @@
 # 前端测试
 
-没有构建步骤，也没有 npm 依赖 —— 只要有 `node`：
+没有构建步骤，也没有 npm 依赖 —— 从仓库根目录运行，需要 `node`：
 
 ```bash
-./run.sh          # 用 fixtures/ 里存好的 /config.json 和 /status
-./run.sh 5000     # 先从跑着的控制台刷新 fixtures，再跑
+bash scripts/test/web/run.sh          # 用 fixtures/ 里存好的 /config.json 和 /status
+bash scripts/test/web/run.sh 5000     # 先从跑着的控制台刷新 fixtures，再跑
 ```
 
 `shim.mjs` 是一个刚好够把页面启动起来的 DOM。它**故意**在两件事上跟浏览器一致，

@@ -1,4 +1,4 @@
-> 开源版本运行入口见根 README；使用 `configs/gpu/environment.example.sh` 配置自己的环境。DLC历史命令不作为本版本启动方式。
+> 开源版本运行入口见根 README；使用 `scripts/env/environment.example.sh` 配置自己的环境。DLC历史命令不作为本版本启动方式。
 
 # 独立安装环境：PPU、NVIDIA 与 VLN Demo
 
@@ -92,7 +92,7 @@ export CUDA_PATH="$CUDA_HOME"
 export LD_LIBRARY_PATH="/opt/accl-p:$CUDA_HOME/lib64:/usr/local/PPU_SDK/lib:/usr/local/lib:${LD_LIBRARY_PATH:-}"
 ```
 
-当前开源入口继承已激活的 SDK/CUDA 环境。PPU 按实际安装位置 source SDK；训练与模拟环境路径统一填写到 configs/gpu/environment.example.sh 的本机副本。
+当前开源入口继承已激活的 SDK/CUDA 环境。PPU 按实际安装位置 source SDK；训练与模拟环境路径统一填写到 scripts/env/environment.example.sh 的本机副本。
 
 ### 3.2 Python 安装次序
 
@@ -244,7 +244,7 @@ Python 小版本、torch ABI、SDK/CUDA、设备 ISA 任一变化，都重新编
 | RynnBrain | `https://github.com/alibaba-damo-academy/RynnBrain.git`，`40f19547941454835ff5e63c22994da74605cfea`，使用 `navigation/` |
 | GPU renderer | 已维护在本仓 `third_party/abot_renderer/`，来源见上一节 |
 
-当前根目录启动器从 `environment.local.sh` 读取本机配置。按[环境配置](README.md#environment-setup)设置训练解释器、仿真环境和外部资源；多节点任务使用相同的绝对路径。
+当前 scripts/ 下的启动器从 `scripts/env/environment.local.sh` 读取本机配置。按[环境配置](README.md#environment-setup)设置训练解释器、仿真环境和外部资源；多节点任务使用相同的绝对路径。
 
 - 可视化与闭环评测使用 `RYNNBRAIN_VENV`、`RYNNBRAIN_NAV_DIR` 和系统 Mesa。自定义 Mesa 安装可设置 `MESA_ROOT`。模型、训练配置和评测资产通过 `configs/gpu/evaluation.json` 绑定。
 - 开环训练使用 `configs/gpu/openloop.json` 中的初始化权重、三源数据与索引。联合 RL 的 `configs/gpu/rloo.yaml` 使用单独的训练清单、Megatron 源码、Ray 地址和 Gym 服务地址。

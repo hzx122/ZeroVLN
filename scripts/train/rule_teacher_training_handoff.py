@@ -218,7 +218,7 @@ def prepare_published_training(config):
     launch = dict(experiment_config=str(cfg), experiment_config_sha256=sha(cfg), environment=env,
         initialize_argv=[config['python'],'-B',source+'/verl/sft/initialize_action_head_scale.py',
                          '--experiment-config',str(cfg),'--scale','D16'],
-        train_argv=['bash',source+'/verl/scripts/train/action_head_dualvln_sft/entry.sh',
+        train_argv=['bash',source+'/scripts/train/action_head_dualvln_sft/entry.sh',
                     '--action-head-as-tool-version',version])
     resume = config.get('warm_start')
     if resume:
@@ -490,7 +490,7 @@ def prepare(config, c):
     launch.update(experiment_config=str(cfg), experiment_config_sha256=sha(cfg), environment=env,
         initialize_argv=[config['python'], '-B', config['training_source']+'/verl/sft/initialize_action_head_scale.py',
                          '--experiment-config', str(cfg), '--scale', 'D16'],
-        train_argv=['bash', config['training_source']+'/verl/scripts/train/action_head_dualvln_sft/entry.sh',
+        train_argv=['bash', config['training_source']+'/scripts/train/action_head_dualvln_sft/entry.sh',
                     '--action-head-as-tool-version', 'v6'])
     save(root/'fast-window-audit.json', audit)
     save(root/'launch-plan.json', launch)

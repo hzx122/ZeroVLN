@@ -181,7 +181,7 @@ def episode(row, args, run, destination):
     started = time.monotonic()
     print(json.dumps({'episode': row['logical_id'], 'phase': 'controller_start'}), flush=True)
     try:
-        command = ['bash', str(REPO / 'vln_demo/src/run_console.sh'), str(port),
+        command = ['bash', str(REPO / 'scripts/demo/run_console.sh'), str(port),
                    '--split', row['split'], '--scene', ('rxr-' if row['dataset']=='rxr' else '') + row['scene'],
                    '--episode_id', row['episode_id'], '--out', str(controller_output)]
         with (local / 'controller.log').open('w') as log:

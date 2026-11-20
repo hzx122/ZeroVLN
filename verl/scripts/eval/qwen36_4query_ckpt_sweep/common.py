@@ -126,7 +126,7 @@ def delta_endpoint(points: Iterable[Iterable[float]]) -> dict[str, float]:
 def checkpoint_identity(checkpoint_dir: str | Path) -> dict[str, Any]:
     root = Path(checkpoint_dir)
     match = re.fullmatch(r"global_step_(\d{6})", root.name)
-    if not match:
+    if not match and root.name != "ZeroVLN":
         raise ValueError(f"invalid checkpoint directory name: {root.name}")
     report_path = root / "report.json"
     report = json.loads(report_path.read_text(encoding="utf-8"))
@@ -138,8 +138,13 @@ def checkpoint_identity(checkpoint_dir: str | Path) -> dict[str, Any]:
                if not path.is_file()]
     if missing:
         raise FileNotFoundError(f"incomplete checkpoint, missing={missing}")
-    step = int(match.group(1))
     rl_checkpoint = report.get("schema") == "action_head_ray_grpo_checkpoint"
+    if match:
+        step = int(match.group(1))
+    else:
+        step = report.get("step")
+        if not rl_checkpoint or type(step) is not int or step < 0:
+            raise ValueError(f"invalid release checkpoint metadata: {report_path}")
     if rl_checkpoint:
         if (int(report.get("step", -1)) != step or report.get("train_scope") != "full"
                 or report.get("publication_kind") != "checkpoint"

@@ -14,11 +14,11 @@ parameters. It does not exercise joint reinforcement learning. Omitting this
 option preserves the published four-node training recipe.
 
 ```bash
-./run_openloop.sh prepare --smoke-steps 1 \
+./scripts/train/run_openloop.sh prepare --smoke-steps 1 \
   --output-dir "$RL_ARTIFACT_ROOT/review-training"
-./run_openloop.sh initialize \
+./scripts/train/run_openloop.sh initialize \
   --output-dir "$RL_ARTIFACT_ROOT/review-training"
-CUDA_VISIBLE_DEVICES=0,1,2,3 ./run_openloop.sh run \
+CUDA_VISIBLE_DEVICES=0,1,2,3 ./scripts/train/run_openloop.sh run \
   --output-dir "$RL_ARTIFACT_ROOT/review-training" --node-rank 0 \
   --master-addr 127.0.0.1 --master-port 29671
 ```
@@ -55,9 +55,9 @@ opts=(recipe.nnodes=1 'recipe.learner_gpus_layout="16"'
       recipe.max_tool_calls=3 recipe.opt_steps=1 recipe.checkpoint_interval=1)
 (
   set -e
-  ./run_rl_services.sh run.mode=start "${opts[@]}"
-  trap './run_rl_services.sh run.mode=stop' EXIT
-  ./run_rloo.sh "${opts[@]}" "run.output_dir=$RL_ARTIFACT_ROOT/$EXPR_NAME"
+  ./scripts/train/rloo/run_rl_services.sh run.mode=start "${opts[@]}"
+  trap './scripts/train/rloo/run_rl_services.sh run.mode=stop' EXIT
+  ./scripts/train/rloo/run_rloo.sh "${opts[@]}" "run.output_dir=$RL_ARTIFACT_ROOT/$EXPR_NAME"
 )
 ```
 
@@ -84,7 +84,7 @@ config = json.loads(Path('configs/gpu/evaluation.json').read_text())
 config.update(nodes=1, evaluation_repeats=1, max_tool_calls=2)
 Path('evaluation.smoke.local.json').write_text(json.dumps(config, indent=2)+'\n')
 PY
-./run_evaluation.sh smoke --config evaluation.smoke.local.json \
+./scripts/eval/run_evaluation.sh smoke --config evaluation.smoke.local.json \
   --output-dir "$RL_ARTIFACT_ROOT/review-evaluation" --smoke-gpus 0,1
 ```
 

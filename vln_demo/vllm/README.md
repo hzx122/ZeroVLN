@@ -6,7 +6,7 @@
 
 | 服务 | 入口 | 默认端口 | 默认设备 | 说明 |
 |---|---|---:|---|---|
-| Next vLLM（pi-agent 默认） | `vllm38next` | 9038 | 4-11 | Qwen3.8-Flash-Next，TP8/DP1，262144 上下文，served model `qwen3.8-flash-next` |
+| Next vLLM（pi-agent 默认） | `vllm38next.sh` | 9038 | 4-11 | Qwen3.8-Flash-Next，TP8/DP1，262144 上下文，served model `qwen3.8-flash-next` |
 | 普通 vLLM（控制台默认） | `vllm-vln-35B.sh` | 28900 | 12,13 | 通用 Qwen3.6-35B；prefix cache + 可选 MTP |
 | 四-query Action Head | `vllm-action-head-query.sh` | 28899 | 14,15 | 专用 worker/logits processor；固定不启用 MTP |
 
@@ -15,13 +15,10 @@ PPU 0-3 留给四个 3DGS render server，与 Next 的 8 卡和 35B 的 2 卡组
 ## Next 模型
 
 ```bash
-bash vln_demo/vllm/vllm38next
+bash scripts/serve/vllm/vllm38next.sh
 ```
 
-`vln_demo/vllm/vllm38next` 是唯一维护版本，与本目录的 SGLang、其他 vLLM 启动脚本一起纳入 Git。以下旧入口均为指向它的软链接：
-
-- `/opt/external/user-d5121be6/vllm38next`
-- `/opt/external/user-d5121be6/model/flagos-qwen38-public/runtime/vllm38next`
+`scripts/serve/vllm/vllm38next.sh` 是仓库入口；已有部署如果使用仓库外的软链接，请将链接目标更新到此路径。
 
 脚本沿用公开镜像 runtime、PPU 4-11、TP8/DP1 和端口 9038。原 SGLang 八卡槽由它接替；`sglang-qwen3.8-27B.sh` 仅保留为手动切回入口，不与 Next 同时启动。
 
@@ -66,7 +63,7 @@ PY
 ## 普通 vLLM
 
 ```bash
-bash vln_demo/vllm/vllm-vln-35B.sh
+bash scripts/serve/vllm/vllm-vln-35B.sh
 ```
 
 常用覆盖变量：`VLLM_MODEL`、`VLLM_GPUS`、`VLLM_PORT`、`VLLM_MAX_MODEL_LEN`、`VLLM_GPU_MEMORY_UTILIZATION`、`VLLM_MTP_TOKENS`、`VLLM_ENABLE_PREFIX_CACHING`。
@@ -78,7 +75,7 @@ bash vln_demo/vllm/vllm-vln-35B.sh
 ```bash
 ACTION_HEAD_QUERY_CHECKPOINT=/path/to/dualvln_query_embeddings.pt \
 ACTION_HEAD_QUERY_CACHE=/dev/shm/action_head_queries \
-bash vln_demo/vllm/vllm-action-head-query.sh
+bash scripts/serve/vllm/vllm-action-head-query.sh
 ```
 
 专用脚本负责 query token、节点本地编译缓存、自定义 worker 和 logits processor。vLLM 0.18 下 custom logits processor 与 speculative decoding 不兼容，因此该入口不接受 MTP 配置。普通基线必须继续调用 `vllm-vln-35B.sh`。

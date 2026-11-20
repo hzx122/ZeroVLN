@@ -17,13 +17,13 @@ NEXT_INTEGRITY = Path(
     "/opt/external/user-d5121be6/model/flagos-qwen38-public/runtime/"
     "config/rootfs-integrity.json")
 SOURCE_FILES = (
-    "vln_demo/dlc/entry.sh", "vln_demo/dlc/attempt.sh", "vln_demo/dlc/defaults.sh",
-    "vln_demo/dlc/prepare_pi_tools.sh",
+    "scripts/demo/dlc/entry.sh", "scripts/demo/dlc/attempt.sh", "scripts/demo/dlc/defaults.sh",
+    "scripts/demo/dlc/prepare_pi_tools.sh",
     "vln_demo/dlc/preflight.py", "vln_demo/dlc/supervise.py",
-    "vln_demo/dlc/submit.py", "vln_demo/dlc/restart_console.py", "vln_demo/dlc/submission.py", "vln_demo/start_all.sh",
-    "vln_demo/vllm/vllm38next", "vln_demo/vllm/launch_next.py",
-    "vln_demo/vllm/next_prefix_cache.py", "vln_demo/vllm/vllm-vln-35B.sh",
-    "vln_demo/src/run_console.sh", "vln_demo/src/vln_model.py",
+    "vln_demo/dlc/submit.py", "vln_demo/dlc/restart_console.py", "vln_demo/dlc/submission.py", "scripts/demo/start_all.sh",
+    "scripts/serve/vllm/vllm38next.sh", "vln_demo/vllm/launch_next.py",
+    "vln_demo/vllm/next_prefix_cache.py", "scripts/serve/vllm/vllm-vln-35B.sh",
+    "scripts/demo/run_console.sh", "vln_demo/src/vln_model.py",
     "vln_demo/src/habitat_topdown.py", "vln_demo/src/vln_geometry.py",
     "vln_demo/src/sage/env.py",
     "vln_demo/src/abotn/env.py",
@@ -37,15 +37,15 @@ SOURCE_FILES = (
     "vln_demo/src/web/js/panels/instr.js", "vln_demo/src/web/js/panels/terminal.js",
     "vln_demo/src/vln_demo.yaml", "vln_demo/src/agent_tools.py", "vln_demo/src/visual_navigation_tools.py",
     "vln_demo/src/remote_habitat/server.py", "vln_demo/src/remote_habitat/client.py",
-    "vln_demo/src/remote_habitat/start.sh",
+    "scripts/demo/remote_habitat/start.sh", "scripts/demo/objectnav/start.sh",
     "vln_demo/src/remote_habitat/policy.py", "vln_demo/src/remote_habitat/worker.py",
     "vln_demo/src/vlnce_training.py", "vln_demo/src/rxr.py",
     "vln_demo/src/lepu/assets.py", "vln_demo/src/lepu/env.py", "vln_demo/src/lepu/floorplan.png",
     "vln_demo/src/mall/assets.py", "vln_demo/src/mall/env.py",
     "vln_demo/src/visual_navigation/planning.py",
     "vln_demo/src/webui.py",
-    "vln_demo/src/prompts.py", "vln_demo/dlc/start_extra.sh", "vln_demo/dlc/lightnav_probe.py",
-    "vln_demo/vllm/sglang-qwen3.8-27B-tp1.sh",
+    "vln_demo/src/prompts.py", "scripts/demo/dlc/start_extra.sh", "vln_demo/dlc/lightnav_probe.py",
+    "scripts/serve/vllm/sglang-qwen3.8-27B-tp1.sh",
     "vln_demo/config/pi/project-models.ts",
 )
 REQUIRED_BACKENDS = "habitat_train,rxr_train_guide,rxr_train_follower,lepu"
@@ -123,7 +123,7 @@ def prepare(base_detail, name, output_dir, repo, *, swap_approvers=None, reason=
         "export VLN_REQUIRED_BACKENDS=" + shlex.quote(
             REQUIRED_BACKENDS + ",lightnav_mujoco," + ",".join(BACKEND_CATEGORIES)),
         "export VLN_EXTRA_SERVICES=1",
-        "exec bash " + shlex.quote(str(repo / "vln_demo/dlc/entry.sh")), ""))
+        "exec bash " + shlex.quote(str(repo / "scripts/demo/dlc/entry.sh")), ""))
     request = {
         "phaseCode": 14, "module": "mfm", "platType": 2,
         "quotaId": detail["quotaId"], "resourceConfig": deepcopy(detail["resourceConfig"]),

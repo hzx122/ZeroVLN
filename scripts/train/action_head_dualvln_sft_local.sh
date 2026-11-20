@@ -12,7 +12,7 @@ done
 [[ "$ACTION_HEAD_AS_TOOL_VERSION" == v1 || "$ACTION_HEAD_AS_TOOL_VERSION" == v2 || "$ACTION_HEAD_AS_TOOL_VERSION" == v3 || "$ACTION_HEAD_AS_TOOL_VERSION" == v4.3 || "$ACTION_HEAD_AS_TOOL_VERSION" == v6 ]] || exit 2
 
 REPO=${REPO:-/workspace/ZeroVLN}
-ENTRY=${ENTRY:-$REPO/verl/scripts/train/action_head_dualvln_sft/entry.sh}
+ENTRY=${ENTRY:-$REPO/scripts/train/action_head_dualvln_sft/entry.sh}
 LOCAL_PYTHON=${LOCAL_PYTHON:-/usr/local/bin/python3.12}
 RUN_NAME=${RUN_NAME:-action-head-fm-formal-p0-local-$(date +%Y%m%d-%H%M%S)}
 NNODES=1

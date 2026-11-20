@@ -401,7 +401,7 @@ def _ensure_action_head_gym(settings):
     push_event("sys", text=f"FM Head 正在启动配套环境（{ACTION_HEAD_DATASET_SPLIT}）…")
     log_file = open(log_path, "ab", buffering=0)
     ACTION_HEAD_GYM_PROCESS = subprocess.Popen(
-        ["bash", os.path.join(REPO_ROOT, "vln_demo/vln_gym_server.sh")],
+        ["bash", os.path.join(REPO_ROOT, "scripts/demo/vln_gym_server.sh")],
         cwd=REPO_ROOT, env=gym_env, stdin=subprocess.DEVNULL,
         stdout=log_file, stderr=subprocess.STDOUT, start_new_session=True)
     deadline = time.monotonic() + 60.0

@@ -55,7 +55,7 @@ venv_render/bin/python ABot-Navigation/render_sim_dynamic.py \
 degree-0，与 3DRS 同款服务进程，但 scenes_root 不同，故独立进程独立卡）。
 `MALL_RENDER_URL` 覆盖地址（默认 7039）。
 
-> 默认由 `vln_demo/start_all.sh` 作为第 4 个渲染服务拉起（PPU3/7039，与 3DRS/
+> 默认由 `scripts/demo/start_all.sh` 作为第 4 个渲染服务拉起（PPU3/7039，与 3DRS/
 > ABotN/SAGE 三个一起"只补不杀"管理）。卡位连续约定见 `start_all.sh` 头注释：
 > 渲染占 PPU0-3，sglang×8 占 4-11，vllm 35B×2 占 12-13。
 

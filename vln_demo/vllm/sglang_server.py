@@ -15,7 +15,7 @@ from urllib.request import ProxyHandler, build_opener
 
 
 def command(config):
-    return ['bash', str(Path(__file__).with_name(config['launcher']))]
+    return ['bash', str(Path(__file__).resolve().parents[2] / 'scripts/serve/vllm' / config['launcher'])]
 
 
 def checked_info(info, config):

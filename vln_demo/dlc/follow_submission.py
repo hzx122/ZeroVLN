@@ -26,9 +26,9 @@ import time
 TERMINAL_PLATFORM = {"failed", "stopped", "cancelled", "canceled", "deleted",
                      "succeeded", "completed", "terminated", "error"}
 TERMINAL_FOLLOW = {"complete", "failed", "needs_attention"}
-REQUIRED_RUNTIME_SOURCES = ("vln_demo/dlc/entry.sh", "vln_demo/dlc/attempt.sh",
+REQUIRED_RUNTIME_SOURCES = ("scripts/demo/dlc/entry.sh", "scripts/demo/dlc/attempt.sh",
                             "vln_demo/dlc/supervise.py", "vln_demo/dlc/preflight.py",
-                            "vln_demo/start_all.sh", "vln_demo/vllm/vllm-vln-35B.sh")
+                            "scripts/demo/start_all.sh", "scripts/serve/vllm/vllm-vln-35B.sh")
 
 
 class NeedsAttention(RuntimeError):

@@ -311,7 +311,7 @@ def _prepare(config_path, output):
         code += [SWEEP / 'native_tool_closedloop_eval.py', REPO / 'vln_demo/src/prompts.py']
     code += [REPO / 'vln_demo/src/vln_gym/observation_profile.py', REPO / 'vln_demo/src/sage/env.py',
              EVAL / 'run_action_head_suite.sh', REPO / 'scripts/train/supervise_rule_teacher_collection.py',
-             REPO / 'vln_demo/vllm/with_local_runtime.sh', REPO / 'vln_demo/vllm/vllm-action-head-query.sh']
+             REPO / 'scripts/serve/vllm/with_local_runtime.sh', REPO / 'scripts/serve/vllm/vllm-action-head-query.sh']
     code.extend((REPO / 'verl/action_head').rglob('*.py'))
     code += [REPO / 'scripts/train/watch_v6_rl_local_credit.py',
              REPO / 'scripts/train/prepare_rule_teacher_three_source.py',
@@ -528,7 +528,7 @@ def main():
                         raise ValueError('suite is already running; use status, do not duplicate writers')
             from supervise_rule_teacher_collection import collection_runtime_root
             runtime = collection_runtime_root() / ('ahs-' + plan['plan_sha256'][:8])
-            command = ['bash', str(REPO / 'vln_demo/vllm/with_local_runtime.sh'),
+            command = ['bash', str(REPO / 'scripts/serve/vllm/with_local_runtime.sh'),
                        'bash', str(EVAL / 'run_action_head_suite.sh')]
             env = dict(os.environ, ACTION_HEAD_LOCAL_RUNTIME_DIR=str(runtime),
                 ACTION_HEAD_SUITE_RUNTIME_BASE=str(runtime / 'stages'), ACTION_HEAD_SUITE_PLAN=str(args.plan.resolve()))

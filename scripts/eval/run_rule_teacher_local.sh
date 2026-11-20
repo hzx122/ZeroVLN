@@ -33,7 +33,7 @@ case "${1:-}" in
   export VLLM_ENFORCE_EAGER=0 VLLM_GPU_MEMORY_UTILIZATION=0.7 VLLM_ENABLE_PREFIX_CACHING=1
   unset VLLM_SCHEDULER_CLS
   export VLLM_MAX_MODEL_LEN=32768 VLLM_MAX_NUM_SEQS=0 VLLM_MAX_NUM_BATCHED_TOKENS=8192
-  exec bash "$REPO/vln_demo/vllm/vllm-vln-35B.sh" ;;
+  exec bash "$REPO/scripts/serve/vllm/vllm-vln-35B.sh" ;;
  render)
   RS=/workspace/agentic_sim/repo/ABot-Navigation/render_server
   export PYTHONPATH=$REPO/vln_demo/render_libs:$RS/submodules/diff-plane-rasterization:$RS/submodules/simple-knn:$RS

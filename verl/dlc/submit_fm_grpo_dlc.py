@@ -35,7 +35,7 @@ from alibabacloud_pai_dlc20201203.models import (  # noqa: E402
 )
 from workspace_config import build_data_sources, resolve_workspace  # noqa: E402
 
-ENTRY = REPO / "verl" / "dlc" / "fm_grpo_entry.sh"
+ENTRY = REPO / "scripts/cluster/fm_grpo_entry.sh"
 
 # 默认超参 = docs/实验记录.md#legacy-docs-20260921 §4 同款。EPISODES/VAL_EPISODES 空 → entry 从 bench /spec 自动读。
 DEFAULTS = dict(

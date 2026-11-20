@@ -25,7 +25,7 @@ GL 在单个专属线程，请求指定完整位姿，导航状态在每个 CPU 
 GS 使用 GPU CUDA rasterization + PPU host-copy；标准 mesh 使用 CPU llvmpipe。
 
 ```bash
-OBJECTNAV_GPU=1 OBJECTNAV_PORT=17041 OBJECTNAV_MANIFEST=/CPFS/run/catalog-cpfs.jsonl bash vln_demo/src/objectnav/start.sh
+OBJECTNAV_GPU=1 OBJECTNAV_PORT=17041 OBJECTNAV_MANIFEST=/CPFS/run/catalog-cpfs.jsonl bash scripts/demo/objectnav/start.sh
 # 用现有 Habitat console Python（其 lib 在 LD_LIBRARY_PATH）：
 PYTHONPATH=vln_demo/src python -m objectnav.probe --manifest /CPFS/run/pilot.jsonl --url http://127.0.0.1:17041 --output /CPFS/run/probe
 ```

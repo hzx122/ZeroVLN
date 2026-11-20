@@ -4,8 +4,8 @@
 habitat-lab 的 task/dataset 那一层，直接用 habitat_sim 的 `Simulator`：
 `hsim/env.py` 是共用仿真器，`hsim/datasets.py` 描述每套资产怎么读。
 
-    ./src/run_console.sh 5000                      # 四套资产全挂（默认）
-    DEMO_BACKEND=partnr ./src/run_console.sh 5000  # 只挂 PARTNR
+    ./scripts/demo/run_console.sh 5000                      # 四套资产全挂（默认）
+    DEMO_BACKEND=partnr ./scripts/demo/run_console.sh 5000  # 只挂 PARTNR
 
 页面上先选「资产集」，场景下拉只列所选集里的场景——MP3D 的 id、HSSD 的数字、
 3DRS 的哈希混在一个列表里根本分不清谁是谁。

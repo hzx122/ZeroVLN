@@ -269,7 +269,7 @@ class VllmService:
                     f"\n[action-head] retrying vLLM startup attempt "
                     f"{attempt}/{attempts}\n".encode())
             self.process = subprocess.Popen(
-                ["bash", str(self.repo / "vln_demo/vllm/vllm-vln-35B.sh")],
+                ["bash", str(self.repo / "scripts/serve/vllm/vllm-vln-35B.sh")],
                 cwd=self.repo, env=env, stdout=self._log_handle,
                 stderr=subprocess.STDOUT, start_new_session=True)
             deadline = time.monotonic() + self.startup_timeout

@@ -365,7 +365,7 @@ def evaluate_one(args, checkpoint: Path, step_output: Path) -> None:
         "VLLM_PID_FILE": str(pid_file),
     })
     if not bootstrap_layout:
-        run(["bash", str(HERE / "launch_vllm_for_ckpt.sh")],
+        run(["bash", str(REPO / "scripts/eval/qwen36_4query_ckpt_sweep/launch_vllm_for_ckpt.sh")],
             env=launch_env, log=log_dir / "vllm_launcher.log")
     try:
         closed_summary = step_output / "closedloop" / "summary.json"
@@ -417,7 +417,7 @@ def evaluate_one(args, checkpoint: Path, step_output: Path) -> None:
                     "LIMIT_CLOSEDLOOP_CASES": str(args.limit_closedloop_cases),
                     "ALLOW_PARTIAL_CLOSEDLOOP": str(int(args.allow_partial_closedloop)),
                 })
-                closedloop_command = ["bash", str(REPO / "verl/scripts/train/action_head_bootstrap/v3_collect_entry.sh"),
+                closedloop_command = ["bash", str(REPO / "scripts/train/action_head_bootstrap/v3_collect_entry.sh"),
                                       "--action-head-as-tool-version", args.action_head_as_tool_version,
                                       "--bootstrap-round", "1"]
             run(closedloop_command, env=env, log=log_dir / "closedloop.log")
@@ -444,7 +444,7 @@ def evaluate_one(args, checkpoint: Path, step_output: Path) -> None:
         audit = {
             "schema": "qwen36_4query_service_audit_v1",
             "checkpoint": identity,
-            "vllm_entry": str(REPO / "vln_demo/vllm/vllm-action-head-query.sh"),
+            "vllm_entry": str(REPO / "scripts/serve/vllm/vllm-action-head-query.sh"),
             "vllm_port": 28899,
             "vllm_gpus": "0-11 (6 x TP2)" if bootstrap_layout else "14,15",
             "eval_layout": "bootstrap" if bootstrap_layout else "serial",
@@ -461,7 +461,7 @@ def evaluate_one(args, checkpoint: Path, step_output: Path) -> None:
         }
         if native:
             audit.update(condition_mode="v5_native", query_tail=False,
-                         vllm_entry=str(HERE / "launch_native_vllm.sh"),
+                         vllm_entry=str(REPO / "scripts/eval/qwen36_4query_ckpt_sweep/launch_native_vllm.sh"),
                          expected_condition_shape=expected_query_shape,
                          consumed_condition_count=query_artifacts,
                          aggregator_sha256=identity["aggregator_sha256"],
