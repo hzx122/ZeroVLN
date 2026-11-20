@@ -1,10 +1,14 @@
 <h1 align="center">ZeroVLN: Learning to Navigate without Supervised Fine-Tuning of the VLM Brain</h1>
 <p align="center">
   <a href="https://arxiv.org/abs/2611.26414"><img src="docs/icons/arxiv.png" width="20" height="20" align="center" alt=""> <strong>arXiv paper</strong></a>
-  &emsp;
+  <br>
   <a href="https://huggingface.co/hzxllll/ZeroVLN"><img src="docs/icons/huggingface.svg" width="22" height="22" align="center" alt=""> <strong>Hugging Face model</strong></a>
 </p>
-<p align="center"><a href="#benchmark-results">Results</a> &ensp; <a href="#quick-start">Quick start</a> &ensp; <a href="#examples">Navigation examples</a> &ensp; <a href="#environment-setup">Installation</a> &ensp; <a href="#workflow-deployment">Training and evaluation</a></p>
+<p align="center"><a href="#benchmark-results">Results</a><br>
+  <a href="#quick-start">Quick start</a><br>
+  <a href="#examples">Navigation examples</a><br>
+  <a href="#environment-setup">Installation</a><br>
+  <a href="#workflow-deployment">Training and evaluation</a></p>
 
 **ZeroVLN learns to navigate without navigation-domain supervised fine-tuning (SFT) of the VLM brain and largely preserves the brain’s general visual capabilities.** To our knowledge, it is the first VLN-CE codebase to jointly train a VLM brain and a continuous-action expert through closed-loop, multi-turn reinforcement learning. The expert first learns to execute the frozen brain’s natural-language movement requests from reference trajectories. During joint RL, the brain observes the result of each request before choosing the next, and Trajectory-Level RLOO uses the episode return to improve both policies. Across 12 general visual benchmarks with free-form answers, ZeroVLN achieves **59.16% mean accuracy**, close to the base brain’s **59.47%**.
 
@@ -18,7 +22,7 @@ The repository includes a **browser console and an HTTP Gym for R2R-CE, RxR-CE a
 
 Joint RL raises the success rate from **36.9% to 51.3%** on SAGE-3D, **17.0% to 52.7%** on R2R-CE, and **18.7% to 51.4%** on RxR-CE. Each table entry gives the success rate (SR) followed by success weighted by path length (SPL).
 
-| Method | SAGE-3D | R2R-CE | RxR-CE |
+| <div align="center">Method</div> | <div align="center">SAGE-3D</div> | <div align="center">R2R-CE</div> | <div align="center">RxR-CE</div> |
 | --- | ---: | ---: | ---: |
 | Direct Tool Use | 39.5% / 24.5% | 19.0% / 10.2% | 21.8% / 13.5% |
 | ZeroVLN (Init) | 36.9% / 20.3% | 17.0% / 8.40% | 18.7% / 9.61% |
@@ -26,12 +30,12 @@ Joint RL raises the success rate from **36.9% to 51.3%** on SAGE-3D, **17.0% to 
 
 ## What you can do with ZeroVLN
 
-| Task | What you need | Start here |
+| <div align="center">Task</div> | <div align="center">What you need</div> | <div align="center">Start here</div> |
 | --- | --- | --- |
-| Watch or evaluate a checkpoint | Brain, action-expert checkpoint and benchmark scenes | [Browser console](#browser-console) · [Closed-loop evaluation](#closed-loop-evaluation) |
-| Run your own policy across interaction rounds | Reachable training Gym and an episode from the case manifest | [Start the Gym](#training-gym-and-http-client) · [Python client example](#drive-a-gym-session-from-an-rl-worker) |
-| Collect supervision and train the action expert | A collection plan for the planner, or published trajectories and indices for training | [Collect reference trajectories](#reference-trajectory-collection) · [Initialize the expert](#action-expert-initialization) |
-| Jointly optimize the brain and expert | Initialized expert, base brain, training cases and Gym services | [16-device deployment](RUNTIME_VALIDATION.md#one-joint-rl-update-on-16-devices) · [Full recipe](#joint-reinforcement-learning) |
+| Watch or evaluate a checkpoint | Brain, action-expert checkpoint and benchmark scenes | [Browser console](#browser-console)<br>[Closed-loop evaluation](#closed-loop-evaluation) |
+| Run your own policy across interaction rounds | Reachable training Gym and an episode from the case manifest | [Start the Gym](#training-gym-and-http-client)<br>[Python client example](#drive-a-gym-session-from-an-rl-worker) |
+| Collect supervision and train the action expert | A collection plan for the planner, or published trajectories and indices for training | [Collect reference trajectories](#reference-trajectory-collection)<br>[Initialize the expert](#action-expert-initialization) |
+| Jointly optimize the brain and expert | Initialized expert, base brain, training cases and Gym services | [Single-node training](RUNTIME_VALIDATION.md#one-joint-rl-update-on-16-devices)<br>[Distributed training](#joint-reinforcement-learning) |
 
 ## Quick start
 
@@ -58,7 +62,7 @@ export TRAINING_CONFIG="$INITIAL_CHECKPOINT/training_config.json"
   --output-dir "$RL_ARTIFACT_ROOT/navigation-console" --port 5002
 ```
 
-Open `http://127.0.0.1:5002` on the host or forward port 5002. Select a benchmark, scene and instruction, load the first view, then run the policy. The camera view, map and tool history should advance together. For an automated first run, the [two-device evaluation](RUNTIME_VALIDATION.md#one-navigation-case-per-benchmark) completes one episode per benchmark and writes `smoke/smoke-summary.json` with `complete: true` and `ok: true`.
+Open `http://127.0.0.1:5002` on the host or forward port 5002. Select a benchmark, scene and instruction, load the first view, then run the policy. The camera view, map and tool history should advance together. For an automated first run, the [evaluation walkthrough](RUNTIME_VALIDATION.md#one-navigation-case-per-benchmark) completes one episode per benchmark and writes `smoke/smoke-summary.json` with `complete: true` and `ok: true`.
 
 ## Examples
 
@@ -73,7 +77,7 @@ In the R2R episode below, the instruction is “Exit the room into the hallway a
 The example below resets one case from your training manifest and sends two turns to the same simulator session. It prints the reward and termination flags after each turn. In a learned rollout the policy chooses the next action from the returned observation. Follow the [training Gym deployment](#training-gym-and-http-client), then run the example with `TRAIN_CASES` and `BENCH_URLS` set.
 
 <details>
-<summary>Python example · reset, step twice and close the session</summary>
+<summary>Reset a Gym session, take two steps and close it in Python</summary>
 
 ```python
 import json
@@ -128,7 +132,7 @@ Use the **browser console** to select a benchmark, scene, and instruction, load 
 
 Use the **HTTP Gym** when a policy drives the same task programmatically. Create a session for an episode and keep its ID across rounds. Each step advances that session’s simulator and returns an observation, reward, termination flags, and step information. The rollout worker uses the new observation to choose its next tool call.
 
-| Benchmark | Environment | Backend |
+| <div align="center">Benchmark</div> | <div align="center">Environment</div> | <div align="center">Backend</div> |
 | --- | --- | --- |
 | R2R-CE | Matterport3D scenes in Habitat | `r2r` |
 | RxR-CE | Matterport3D scenes in Habitat | `rxr` |
@@ -137,12 +141,12 @@ Use the **HTTP Gym** when a policy drives the same task programmatically. Create
 <details>
 <summary>Training and inference components</summary>
 
-| Component | Role | Implementation |
+| <div align="center">Component</div> | <div align="center">Role</div> | <div align="center">Implementation</div> |
 | --- | --- | --- |
 | Environment services | Render observations, advance the simulator, and score interactions | [Gym service launcher](scripts/train/rloo/run_rl_services.sh) |
 | Rollout workers | Keep episode state across calls and collect trajectories from the brain and expert | [Rollout worker](verl/action_head_rl/rollout.py) |
 | Brain inference | Serve the VLM for tool decisions during rollout | [vLLM service](verl/action_head_rl/vllm_service.py) |
-| Joint learner | Coordinate distributed updates to the brain and expert and save their training state | [Trainer](verl/action_head_rl/trainer.py) · [Megatron worker](verl/action_head_rl/megatron_worker.py) |
+| Joint learner | Coordinate distributed updates to the brain and expert and save their training state | [Trainer](verl/action_head_rl/trainer.py)<br>[Megatron worker](verl/action_head_rl/megatron_worker.py) |
 | Experiment recipes | Select joint, brain-only, or expert-only updates, trajectory- or round-level credit, and reward ablations | [RL configuration](configs/gpu/rloo.yaml) |
 
 </details>
@@ -259,7 +263,7 @@ out="$RL_ARTIFACT_ROOT/openloop"
   --master-addr "${MASTER_IP:?}" --master-port 29561
 ```
 
-The default layout uses four nodes with 16 devices each. For a first deployment, the [four-device training recipe](RUNTIME_VALIDATION.md#bounded-action-expert-training) uses real trajectories. Check `launch/run-node<RANK>.json` for exit code zero and the checkpoint’s `report.json` for the parameter changes and frozen-brain audit. For joint RL, set `INITIAL_CHECKPOINT` to that checkpoint under `checkpoints/<run-name>/`; retain `experiment_config.json` for evaluation.
+The full expert training configuration uses four nodes with 16 accelerators per node. The [expert training walkthrough](RUNTIME_VALIDATION.md#bounded-action-expert-training) runs on four PPUs on one node using real trajectories. Check `launch/run-node<RANK>.json` for exit code zero and the checkpoint’s `report.json` for the parameter changes and frozen-brain audit. For joint RL, set `INITIAL_CHECKPOINT` to that checkpoint under `checkpoints/<run-name>/`; retain `experiment_config.json` for evaluation.
 
 </details>
 
@@ -293,7 +297,7 @@ Once status reports `ready: true`, run the [reset, step and close example](#driv
 <details>
 <summary>Ray cluster, Gym services and joint learner</summary>
 
-Start with the initialized action expert, base brain, training manifest and Gym assets above. For one PPU node, use the complete [16-device training recipe](RUNTIME_VALIDATION.md#one-joint-rl-update-on-16-devices). It launches eight Gyms, creates a local Ray runtime, samples four pairs of trajectories and saves a joint checkpoint. The following commands deploy the full [Trajectory-Level RLOO configuration](configs/gpu/rloo.yaml), which defaults to eight 16-device nodes and 512 rollout workers.
+Start with the initialized action expert, base brain, training manifest and Gym assets above. The [single-node training walkthrough](RUNTIME_VALIDATION.md#one-joint-rl-update-on-16-devices) runs on 16 PPUs. It starts eight Gym instances and a local Ray runtime, samples four pairs of trajectories and saves a joint checkpoint. The following commands deploy the full [Trajectory-Level RLOO configuration](configs/gpu/rloo.yaml), which defaults to eight nodes with 16 accelerators per node and 512 rollout workers in total.
 
 1. Activate the same training environment on all nodes. Use an existing Ray cluster spanning the allocated hosts, or start Ray on the head and then join the other nodes. Set `MASTER_IP` to the head node’s reachable IP on all hosts. If starting a new cluster, run `ray start --head --node-ip-address="$MASTER_IP" --port=6379` on the head and `ray start --address="$MASTER_IP:6379"` on each worker. Confirm all eight nodes appear in `ray status` on the head.
 2. Start local services on **each** node. Use the same experiment name and method settings everywhere. Give each node its own service output directory on shared storage. The default service ports are 8950–9013 for 64 Gyms per node.
@@ -335,7 +339,7 @@ Check `train/rollouts.jsonl` for sampled episodes, `train/training_updates.jsonl
 
 Use the [evaluation selection](configs/gpu/evaluation.json). Each checkpoint entry binds the action expert and query (`path`), its `training_config`, and the actual brain weights (`brain`). For ZeroVLN (Init), use the base brain. For joint RL, set `brain` to the `qwen/` directory exported with the selected action expert. With the supplied selection template this means setting `SLOW_MODEL="$INITIAL_CHECKPOINT/qwen"` in the evaluation shell after choosing the checkpoint. The console reads the same selection.
 
-For an initial check, follow the [two-device evaluation recipe](RUNTIME_VALIDATION.md#one-navigation-case-per-benchmark). It runs one real episode per benchmark and writes `smoke/smoke-summary.json`; both `complete` and `ok` must be true. For the default full selection, use four nodes, four repeats and a budget of 200 tool calls:
+For an initial check, follow the [evaluation walkthrough](RUNTIME_VALIDATION.md#one-navigation-case-per-benchmark). It uses two PPUs to run one episode per benchmark and writes `smoke/smoke-summary.json`; both `complete` and `ok` must be true. For the default full selection, use four nodes, four repeats and a budget of 200 tool calls:
 
 ```bash
 out="$RL_ARTIFACT_ROOT/evaluation"
