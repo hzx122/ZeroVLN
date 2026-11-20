@@ -30,7 +30,7 @@ Joint RL improves navigation success over ZeroVLN (Init) by **14.4 percentage po
 
 ## Quick start
 
-**1. Download the step-152 checkpoint.** The [ZeroVLN weights on Hugging Face](https://huggingface.co/hzxllll/ZeroVLN/tree/776a2450bb6968f38cbeb453e37f0566bbad350d) contain the jointly trained brain, action expert and query embeddings (70.4 GB). On a configured host, run the following in Bash from the ZeroVLN repository root. First complete [environment setup](#environment-setup) and set the benchmark asset paths and `FAST_BACKBONE` in `environment.local.sh`. The expert uses a separate frozen Qwen3.5-4B visual backbone; point `FAST_BACKBONE` to your local copy.
+**1. Download the step-152 checkpoint.** The [ZeroVLN weights on Hugging Face](https://huggingface.co/hzxllll/ZeroVLN/tree/680302ef1263268531a9f22c5b1c3965782ea674) contain the jointly trained brain, action expert and learnable query embeddings (70.4 GB). On a configured host, run the following in Bash from the ZeroVLN repository root. First complete [environment setup](#environment-setup) and set the benchmark asset paths and `FAST_BACKBONE` in `environment.local.sh`. The expert uses a separate frozen Qwen3.5-4B visual backbone. Point `FAST_BACKBONE` to your local copy.
 
 ```bash
 source ./environment.local.sh
@@ -39,16 +39,16 @@ export INITIAL_CHECKPOINT="$RL_ARTIFACT_ROOT/checkpoints/global_step_000152"
 
 # With the Hugging Face CLI installed, sign in using an account with read access.
 hf auth login
-hf download hzxllll/ZeroVLN --revision 776a2450bb6968f38cbeb453e37f0566bbad350d \
+hf download hzxllll/ZeroVLN --revision 680302ef1263268531a9f22c5b1c3965782ea674 \
   --local-dir "$INITIAL_CHECKPOINT"
-cp configs/gpu/step152/report.json "$INITIAL_CHECKPOINT/report.json"
+"$PYTHON" scripts/prepare_checkpoint.py "$INITIAL_CHECKPOINT"
 ```
 
-**2. Load the checkpoint and watch an episode.** Keep the directory name `global_step_000152`. The evaluator reads the step identity from [report.json](configs/gpu/step152/report.json), loads the expert and query from `action_head/` and `dualvln_query/` under `INITIAL_CHECKPOINT`, and serves the trained brain from `qwen/`. In the same shell, select the matching training configuration and start the console with a fresh output directory:
+**2. Load the checkpoint and watch an episode.** Keep the directory name `global_step_000152`. The evaluator reads the downloaded `report.json` and serves the trained brain from `qwen/`. The action expert and learnable queries are distributed in `action_head/` and `learnable_query/`. The preparation command links the query file into the runtime’s expected layout. In the same shell, select the matching training configuration and start the console with a fresh output directory:
 
 ```bash
 export SLOW_MODEL="$INITIAL_CHECKPOINT/qwen"
-export TRAINING_CONFIG="$PWD/configs/gpu/step152/training_config.json"
+export TRAINING_CONFIG="$INITIAL_CHECKPOINT/training_config.json"
 ./run_navigation.sh --config configs/gpu/evaluation.json \
   --output-dir "$RL_ARTIFACT_ROOT/navigation-console" --port 5002
 ```
@@ -199,7 +199,7 @@ Install the vendor runtime dependencies and the compatible Habitat-Sim, Habitat-
 **Configure the host.** Edit the absolute paths in `environment.local.sh`. Set `PYTHON` to the training interpreter above and `RYNNBRAIN_VENV` to the demo environment directory. Install the external source trees and supply the inputs used by your workflow:
 
 - **Navigation assets.** Point `RYNNBRAIN_NAV_DIR` at the RynnBrain `navigation/` checkout with its `data/` tree, R2R/RxR episodes and licensed Matterport3D scenes under `data/scene_datasets/mp3d/`. For SAGE, set `SAGE_ROOT` to the dataset containing `SAGE-3D_VLN_Data` and `InteriorGS`, `SAGE_SCENES_ROOT` to the converted Gaussian scenes, and `SAGE_USD_COLLISION_MASK_ROOT` to the collision masks. Evaluation also reads `SAGE_MANIFEST`, `SAGE_PROTOCOL_ROOT` and `NAVMESH_ROOT`.
-- **Model and checkpoint.** Set `SLOW_MODEL` to the Qwen3.6-35B-A3B brain and `FAST_BACKBONE` to the Qwen3.5-4B visual backbone. Set `INITIAL_CHECKPOINT` to the selected step directory containing `action_head/` and `dualvln_query/`, and `TRAINING_CONFIG` to its matching experiment configuration. See the evaluation step below when selecting a jointly trained brain.
+- **Model and checkpoint.** Set `SLOW_MODEL` to the Qwen3.6-35B-A3B brain and `FAST_BACKBONE` to the Qwen3.5-4B visual backbone. Set `INITIAL_CHECKPOINT` to the selected step directory containing the action expert and learnable query weights, and `TRAINING_CONFIG` to its matching experiment configuration. See the evaluation step below when selecting a jointly trained brain.
 - **Training source and data.** Set `VERL_SOURCE_ROOT` to the upstream VERL checkout for that stage. The recorded revisions differ between expert initialization and joint RL. For joint RL also install Megatron Core and Bridge under `MEGATRON_ENV/mcore` and `MEGATRON_ENV/bridge/src`. The exact VERL revisions and required APIs are in the [dependency notes](DEPENDENCIES.md). The stage-specific data inputs are listed below.
 
 Source the file in each new shell. These lightweight checks verify interpreter selection, accelerator visibility and simulator imports before you start services:
