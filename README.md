@@ -1,6 +1,10 @@
 <h1 align="center">ZeroVLN: Learning to Navigate without Supervised Fine-Tuning of the VLM Brain</h1>
-<p align="center"><strong><a href="https://arxiv.org/abs/2611.26414">arXiv paper</a> · <a href="https://huggingface.co/hzxllll/ZeroVLN">Hugging Face model</a></strong></p>
-<p align="center"><a href="#benchmark-results">Results</a> · <a href="#quick-start">Quick start</a> · <a href="#examples">Navigation examples</a> · <a href="#environment-setup">Installation</a> · <a href="#workflow-deployment">Training and evaluation</a></p>
+<p align="center">
+  <a href="https://arxiv.org/abs/2611.26414"><img src="docs/icons/arxiv.png" width="20" height="20" align="center" alt=""> <strong>arXiv paper</strong></a>
+  &emsp;
+  <a href="https://huggingface.co/hzxllll/ZeroVLN"><img src="docs/icons/huggingface.svg" width="22" height="22" align="center" alt=""> <strong>Hugging Face model</strong></a>
+</p>
+<p align="center"><a href="#benchmark-results">Results</a> &ensp; <a href="#quick-start">Quick start</a> &ensp; <a href="#examples">Navigation examples</a> &ensp; <a href="#environment-setup">Installation</a> &ensp; <a href="#workflow-deployment">Training and evaluation</a></p>
 
 **ZeroVLN learns to navigate without navigation-domain supervised fine-tuning (SFT) of the VLM brain and largely preserves the brain’s general visual capabilities.** To our knowledge, it is the first VLN-CE codebase to jointly train a VLM brain and a continuous-action expert through closed-loop, multi-turn reinforcement learning. The expert first learns to execute the frozen brain’s natural-language movement requests from reference trajectories. During joint RL, the brain observes the result of each request before choosing the next, and Trajectory-Level RLOO uses the episode return to improve both policies. Across 12 general visual benchmarks with free-form answers, ZeroVLN achieves **59.16% mean accuracy**, close to the base brain’s **59.47%**.
 
