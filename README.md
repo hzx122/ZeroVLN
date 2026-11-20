@@ -1,14 +1,16 @@
 <h1 align="center">ZeroVLN: Learning to Navigate without Supervised Fine-Tuning of the VLM Brain</h1>
 <p align="center">
-  <a href="https://arxiv.org/abs/2611.26414"><img src="docs/icons/arxiv.png" width="20" height="20" align="center" alt=""> <strong>Paper</strong></a>
+  <a href="https://arxiv.org/abs/2611.26414"><img src="docs/icons/arxiv-badge.svg" height="20" align="center" alt="ZeroVLN paper on arXiv"></a>
   &emsp;
-  <a href="https://huggingface.co/hzxllll/ZeroVLN"><img src="docs/icons/huggingface.svg" width="22" height="22" align="center" alt=""> <strong>Model Weights</strong></a>
+  <a href="https://huggingface.co/hzxllll/ZeroVLN">🤗 <strong>Model Weights</strong></a>
 </p>
 <p align="center"><a href="#benchmark-results">Results</a> &emsp;
   <a href="#quick-start">Quick Start</a> &emsp;
   <a href="#examples">Navigation Examples</a> &emsp;
   <a href="#environment-setup">Installation</a> &emsp;
   <a href="#workflow-deployment">Training and Evaluation</a></p>
+
+This repository is the official implementation of [ZeroVLN: Learning to Navigate without Supervised Fine-Tuning of the VLM Brain](https://arxiv.org/abs/2611.26414).
 
 **ZeroVLN learns to navigate without navigation-domain supervised fine-tuning (SFT) of its vision-language model (VLM) and largely preserves the model’s general visual capabilities.** To our knowledge, ZeroVLN is the first codebase for vision-and-language navigation in continuous environments (VLN-CE) to jointly train a VLM brain and a continuous-action expert through closed-loop, multi-turn reinforcement learning (RL). The expert first learns to execute the frozen brain’s natural-language movement requests using reference trajectories. During joint training, the brain observes the outcome of each request before choosing the next action. Trajectory-Level RLOO uses the episode return to update both policies. On 12 general visual benchmarks with free-form answers, ZeroVLN achieves **59.16% mean accuracy**, compared with **59.47%** for the base VLM.
 
