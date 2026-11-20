@@ -1,4 +1,5 @@
 <h1 align="center">ZeroVLN: Learning to Navigate without Supervised Fine-Tuning of the VLM Brain</h1>
+<p align="center"><strong><a href="https://arxiv.org/abs/2611.26414">arXiv paper</a> · <a href="https://huggingface.co/hzxllll/ZeroVLN">Hugging Face model</a></strong></p>
 <p align="center"><a href="#benchmark-results">Results</a> · <a href="#quick-start">Quick start</a> · <a href="#examples">Navigation examples</a> · <a href="#environment-setup">Installation</a> · <a href="#workflow-deployment">Training and evaluation</a></p>
 
 To our knowledge, **ZeroVLN is the first VLN-CE codebase to jointly train a VLM brain and a continuous-action expert through closed-loop, multi-turn reinforcement learning.** In each interaction round, the brain requests a movement in natural language. The expert executes it, and the brain observes where the agent actually ended up before deciding what to do next. The expert first learns from reference trajectories while the base brain stays frozen. Trajectory-Level RLOO then uses the return from the entire episode to improve both the brain’s choice of requests and the expert’s execution, without navigation-domain supervised fine-tuning of the brain.
@@ -11,13 +12,13 @@ The repository includes a **browser console and an HTTP Gym for R2R-CE, RxR-CE a
 
 ## Benchmark results
 
-Joint RL improves navigation success over ZeroVLN (Init) by **14.4 percentage points on SAGE-3D**, **35.7 on R2R-CE** and **32.7 on RxR-CE**. Table 1 reports success rate (SR) and success weighted by path length (SPL). Each entry is **SR / SPL**, in percent.
+Joint RL raises the success rate from **36.9% to 51.3%** on SAGE-3D, **17.0% to 52.7%** on R2R-CE, and **18.7% to 51.4%** on RxR-CE. Each table entry gives the success rate (SR) followed by success weighted by path length (SPL).
 
 | Method | SAGE-3D | R2R-CE | RxR-CE |
 | --- | ---: | ---: | ---: |
-| Direct Tool Use | 39.5 / 24.5 | 19.0 / 10.2 | 21.8 / 13.5 |
-| ZeroVLN (Init) | 36.9 / 20.3 | 17.0 / 8.40 | 18.7 / 9.61 |
-| ZeroVLN (Ours) | **51.3 / 32.0** | **52.7 / 29.2** | **51.4 / 28.1** |
+| Direct Tool Use | 39.5% / 24.5% | 19.0% / 10.2% | 21.8% / 13.5% |
+| ZeroVLN (Init) | 36.9% / 20.3% | 17.0% / 8.40% | 18.7% / 9.61% |
+| ZeroVLN (Ours) | **51.3% / 32.0%** | **52.7% / 29.2%** | **51.4% / 28.1%** |
 
 ## What you can do with ZeroVLN
 
@@ -30,7 +31,7 @@ Joint RL improves navigation success over ZeroVLN (Init) by **14.4 percentage po
 
 ## Quick start
 
-**1. Download the step-152 checkpoint.** The [ZeroVLN weights on Hugging Face](https://huggingface.co/hzxllll/ZeroVLN/tree/680302ef1263268531a9f22c5b1c3965782ea674) contain the jointly trained brain, action expert and learnable query embeddings (70.4 GB). On a configured host, run the following in Bash from the ZeroVLN repository root. First complete [environment setup](#environment-setup) and set the benchmark asset paths and `FAST_BACKBONE` in `environment.local.sh`. The expert uses a separate frozen Qwen3.5-4B visual backbone. Point `FAST_BACKBONE` to your local copy.
+**1. Download the step-152 checkpoint.** The [ZeroVLN weights on Hugging Face](https://huggingface.co/hzxllll/ZeroVLN/tree/680302ef1263268531a9f22c5b1c3965782ea674) contain the jointly trained brain, action expert and learnable query embeddings (70.4 GB). On a configured host, run the following in Bash from the ZeroVLN repository root. First complete [environment setup](#environment-setup) and set the benchmark asset paths and `FAST_BACKBONE` in `environment.local.sh`. The expert uses a separate frozen Qwen3.5-4B visual backbone. Set `FAST_BACKBONE` to your local copy.
 
 ```bash
 source ./environment.local.sh
@@ -198,7 +199,7 @@ Install the vendor runtime dependencies and the compatible Habitat-Sim, Habitat-
 
 **Configure the host.** Edit the absolute paths in `environment.local.sh`. Set `PYTHON` to the training interpreter above and `RYNNBRAIN_VENV` to the demo environment directory. Install the external source trees and supply the inputs used by your workflow:
 
-- **Navigation assets.** Point `RYNNBRAIN_NAV_DIR` at the RynnBrain `navigation/` checkout with its `data/` tree, R2R/RxR episodes and licensed Matterport3D scenes under `data/scene_datasets/mp3d/`. For SAGE, set `SAGE_ROOT` to the dataset containing `SAGE-3D_VLN_Data` and `InteriorGS`, `SAGE_SCENES_ROOT` to the converted Gaussian scenes, and `SAGE_USD_COLLISION_MASK_ROOT` to the collision masks. Evaluation also reads `SAGE_MANIFEST`, `SAGE_PROTOCOL_ROOT` and `NAVMESH_ROOT`.
+- **Navigation assets.** Set `RYNNBRAIN_NAV_DIR` to the RynnBrain `navigation/` checkout with its `data/` tree, R2R/RxR episodes and licensed Matterport3D scenes under `data/scene_datasets/mp3d/`. For SAGE, set `SAGE_ROOT` to the dataset containing `SAGE-3D_VLN_Data` and `InteriorGS`, `SAGE_SCENES_ROOT` to the converted Gaussian scenes, and `SAGE_USD_COLLISION_MASK_ROOT` to the collision masks. Evaluation also reads `SAGE_MANIFEST`, `SAGE_PROTOCOL_ROOT` and `NAVMESH_ROOT`.
 - **Model and checkpoint.** Set `SLOW_MODEL` to the Qwen3.6-35B-A3B brain and `FAST_BACKBONE` to the Qwen3.5-4B visual backbone. Set `INITIAL_CHECKPOINT` to the selected step directory containing the action expert and learnable query weights, and `TRAINING_CONFIG` to its matching experiment configuration. See the evaluation step below when selecting a jointly trained brain.
 - **Training source and data.** Set `VERL_SOURCE_ROOT` to the upstream VERL checkout for that stage. The recorded revisions differ between expert initialization and joint RL. For joint RL also install Megatron Core and Bridge under `MEGATRON_ENV/mcore` and `MEGATRON_ENV/bridge/src`. The exact VERL revisions and required APIs are in the [dependency notes](DEPENDENCIES.md). The stage-specific data inputs are listed below.
 
@@ -223,7 +224,7 @@ Run each launcher from the repository root with the host environment sourced. Ex
 <details>
 <summary>Collection plan, launch command and output checks</summary>
 
-On the collection host, supply a prepared supervisor plan for the desired source (`sage`, `r2r` or `rxr`). Place it in a fresh attempt directory under `RL_ARTIFACT_ROOT`. Its `source_plan` points to the input and provenance JSON, `environment` defines the child environment, `services` specifies model and simulator commands, ports and health URLs, and `collectors` specifies worker commands and output paths. Use a dedicated disposable node-local `runtime` directory for this attempt. The release expects the plan, referenced files, and source-specific model and scene assets to be supplied by the operator.
+On the collection host, supply a prepared supervisor plan for the desired source (`sage`, `r2r` or `rxr`). Place it in a fresh attempt directory under `RL_ARTIFACT_ROOT`. Its `source_plan` identifies the input and provenance JSON, `environment` defines the child environment, `services` specifies model and simulator commands, ports and health URLs, and `collectors` specifies worker commands and output paths. Use a dedicated disposable node-local `runtime` directory for this attempt. The release expects the plan, referenced files, and source-specific model and scene assets to be supplied by the operator.
 
 ```bash
 : "${COLLECTION_PLAN:?Set the absolute path to your prepared collection plan JSON}"
@@ -240,7 +241,7 @@ The supervisor waits for service health checks before starting collectors. Inspe
 <details>
 <summary>Data preparation, initialization and distributed training</summary>
 
-Use the [open-loop configuration](configs/gpu/openloop.json). Set `PUBLISHED_INPUTS` to the published three-source input JSON, `PUBLISHED_INDEX` to the index root containing `sage/summary.json`, `r2r/summary.json` and `rxr/summary.json`, and `BASE_HEAD_CHECKPOINT` and `BASE_QUERY_CHECKPOINT` to the initialization weights. The reference trajectories and indexed shards these files point to must be mounted on the training hosts.
+Use the [open-loop configuration](configs/gpu/openloop.json). Set `PUBLISHED_INPUTS` to the published three-source input JSON, `PUBLISHED_INDEX` to the index root containing `sage/summary.json`, `r2r/summary.json` and `rxr/summary.json`, and `BASE_HEAD_CHECKPOINT` and `BASE_QUERY_CHECKPOINT` to the initialization weights. The reference trajectories and indexed shards listed in these files must be mounted on the training hosts.
 
 ```bash
 out="$RL_ARTIFACT_ROOT/openloop"
@@ -252,7 +253,7 @@ out="$RL_ARTIFACT_ROOT/openloop"
   --master-addr "${MASTER_IP:?}" --master-port 29561
 ```
 
-The default layout uses four nodes with 16 devices each. For a first deployment, the [four-device, one-update recipe](RUNTIME_VALIDATION.md#bounded-action-expert-training) uses real trajectories. Check `launch/run-node<RANK>.json` for exit code zero and the selected step’s `report.json` for the parameter changes and frozen-brain audit. For joint RL, point `INITIAL_CHECKPOINT` at that step under `checkpoints/<run-name>/`; retain `experiment_config.json` for evaluation.
+The default layout uses four nodes with 16 devices each. For a first deployment, the [four-device, one-update recipe](RUNTIME_VALIDATION.md#bounded-action-expert-training) uses real trajectories. Check `launch/run-node<RANK>.json` for exit code zero and the selected step’s `report.json` for the parameter changes and frozen-brain audit. For joint RL, set `INITIAL_CHECKPOINT` to that step under `checkpoints/<run-name>/`; retain `experiment_config.json` for evaluation.
 
 </details>
 
